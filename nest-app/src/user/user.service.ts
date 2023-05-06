@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -18,13 +20,14 @@ export class UserService {
       throw new NotFoundException(`찾으시는 유저가 없습니다 유저:${id}`);
     }
     return user;
-  }
+  }ㅕ
   deleteUser(id: string): boolean {
     this.getUser(id);
     this.users = this.users.filter((user) => user.id !== id);
     return true;
   }
-  createUser(userData: CreateUserDto): string {
+  async createUser(userData: CreateUserDto): Promise<string> {
+    await this.transformPassword(userData);
     this.users.push({
       id: String(this.users.length + 1),
       ...userData,
@@ -32,10 +35,15 @@ export class UserService {
     return '회원 등록이 완료되었습니다.';
   }
 
+  async transformPassword(userData): Promise<void> {
+    userData.password = await bcrypt.hash(userData.password, 10);
+    return Promise.resolve();
+  }
+
   updateUser(
     id: string,
-    userData: User,
-  ): { updatedUserData: User; message: string } {
+    userData: UpdateUserDto,
+  ): { updatedUserData: UpdateUserDto; message: string } {
     const user = this.getUser(id);
     this.deleteUser(id);
     this.users.push({ ...user, ...userData });

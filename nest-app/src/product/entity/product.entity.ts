@@ -5,4 +5,5 @@ export class Product {
   discount: number;
   description: string;
   img?: string;
+  tags: string[];
 }

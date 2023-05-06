@@ -11,6 +11,7 @@ export class ProductService {
       description: '맛있는 떡',
       price: 10000,
       discount: 10,
+      tags: ['떡'],
     },
   ];
 
