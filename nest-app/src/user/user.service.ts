@@ -1,53 +1,114 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
+import { UserRepository } from './user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [
-    { name: 'lee', id: '1', password: '123' },
-    { name: 'jeon', id: '2', password: '123' },
-  ];
+  constructor(private userRepository: UserRepository) {}
 
-  getUsers(): User[] {
-    return this.users;
-  }
-  getUser(id: string): User {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) {
-      throw new NotFoundException(`찾으시는 유저가 없습니다 유저:${id}`);
+  /**
+   *
+   * @Todo: auth 기능 만든 후 getUsers, getUserById 기능은 관리자 일때만 가능하도록 만들기
+   */
+  async getUsers(): Promise<{ users: User[] }> {
+    try {
+      const users = await this.userRepository.getUser();
+      if (users.length === 0) throw new ForbiddenException('회원이 없습니다');
+      return { users: users };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
-    return user;
-  }ㅕ
-  deleteUser(id: string): boolean {
-    this.getUser(id);
-    this.users = this.users.filter((user) => user.id !== id);
-    return true;
-  }
-  async createUser(userData: CreateUserDto): Promise<string> {
-    await this.transformPassword(userData);
-    this.users.push({
-      id: String(this.users.length + 1),
-      ...userData,
-    });
-    return '회원 등록이 완료되었습니다.';
   }
 
-  async transformPassword(userData): Promise<void> {
-    userData.password = await bcrypt.hash(userData.password, 10);
-    return Promise.resolve();
+  async getUserById(id: number): Promise<User> {
+    try {
+      const user = await this.userRepository.getUserById(id);
+      if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
-  updateUser(
-    id: string,
-    userData: UpdateUserDto,
-  ): { updatedUserData: UpdateUserDto; message: string } {
-    const user = this.getUser(id);
-    this.deleteUser(id);
-    this.users.push({ ...user, ...userData });
-    const updatedUserData = this.getUser(id);
-    return { updatedUserData, message: '수정이 완료되었습니다.' };
+  async deleteUser(id: number): Promise<{ user: User; message: string }> {
+    try {
+      const user = await this.userRepository.getUserById(id);
+      if (!user) throw new NotFoundException('삭제하실 회원이 없습니다');
+      else {
+        await this.userRepository.deleteUser(id);
+        return { user, message: '회원 삭제가 완료되었습니다.' };
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async createUser(
+    userData,
+    file,
+  ): Promise<{ createdUser: User; message: string }> {
+    try {
+      const { filePath } = await this.uploadUserProfile(file);
+      console.log(filePath);
+      const hashedUserData = await this.transformPassword(userData.password);
+      const createdUser = await this.userRepository.createUser({
+        ...userData,
+        profile: filePath,
+        password: hashedUserData,
+      });
+      return { createdUser, message: '회원이 추가되었습니다.' };
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException(
+          '이미 존재하는 userId 이거나 이미 존재하는 휴대폰 번호입니다.',
+        );
+      }
+    }
+  }
+
+  async uploadUserProfile(file: Express.MulterS3.File) {
+    if (!file) {
+      throw new BadRequestException('파일을 업로드해주세요.');
+    }
+    return { filePath: file.location };
+  }
+
+  async transformPassword(password): Promise<User['password']> {
+    password = await bcrypt.hash(password, 10);
+    return password;
+  }
+
+  async updateUser(
+    id: number,
+    updateUserData: UpdateUserDto,
+    file,
+  ): Promise<{ updatedUser: User; message: string }> {
+    try {
+      const user = await this.userRepository.getUserById(id);
+      if (!user)
+        throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
+      else {
+        const updatedUser = await this.userRepository.updateUser(id, {
+          ...updateUserData,
+          profile: file,
+        });
+        return { updatedUser, message: '수정이 완료되었습니다.' };
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }
