@@ -5,19 +5,21 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserRepository } from './user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { S3 } from '@aws-sdk/client-s3';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private readonly config: ConfigService,
+  ) {}
 
   /**
    *
@@ -61,8 +63,8 @@ export class UserService {
     file,
   ): Promise<{ createdUser: User; message: string }> {
     try {
-      const { filePath } = await this.uploadUserProfile(file);
-      console.log(filePath);
+      const { filePath, key } = await this.uploadUserProfile(file);
+      console.log(key);
       const hashedUserData = await this.transformPassword(userData.password);
       const createdUser = await this.userRepository.createUser({
         ...userData,
@@ -75,6 +77,8 @@ export class UserService {
         throw new ConflictException(
           '이미 존재하는 userId 이거나 이미 존재하는 휴대폰 번호입니다.',
         );
+      } else {
+        throw new InternalServerErrorException(error.message);
       }
     }
   }
@@ -83,7 +87,7 @@ export class UserService {
     if (!file) {
       throw new BadRequestException('파일을 업로드해주세요.');
     }
-    return { filePath: file.location };
+    return { filePath: file.location, key: file.key };
   }
 
   async transformPassword(password): Promise<User['password']> {
@@ -95,17 +99,32 @@ export class UserService {
     id: number,
     updateUserData: UpdateUserDto,
     file,
-  ): Promise<{ updatedUser: User; message: string }> {
+  ): Promise<{ updatedUser; message: string }> {
     try {
       const user = await this.userRepository.getUserById(id);
       if (!user)
         throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
       else {
-        const updatedUser = await this.userRepository.updateUser(id, {
-          ...updateUserData,
-          profile: file,
-        });
-        return { updatedUser, message: '수정이 완료되었습니다.' };
+        if (user.profile !== updateUserData.profile) {
+          const s3 = new S3({
+            region: this.config.get('AWS_BUCKET_REGION'),
+            credentials: {
+              accessKeyId: this.config.get('AWS_ACCESS_KEY_ID'),
+              secretAccessKey: this.config.get('AWS_SECRET_ACCESS_KEY'),
+            },
+          });
+
+          const updatedUser = await s3.deleteObject({
+            Bucket: this.config.get('AWS_BUCKET_NAME'),
+            Key: `user/KakaoTalk_Photo_2022-10-28-21-50-33-1685016520368.jpeg`,
+          });
+          console.log(updatedUser);
+          // const updatedUser = await this.userRepository.updateUser(id, {
+          //   ...updateUserData,
+          //   profile: file,
+          // });
+          return { updatedUser, message: '수정이 완료되었습니다.' };
+        }
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);

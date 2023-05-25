@@ -15,7 +15,7 @@ export class UserRepository {
 
   async getUserById(id: number): Promise<User> {
     return this.prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id },
       // include: { product: true },
     });
   }
@@ -41,9 +41,5 @@ export class UserRepository {
       where: { id },
       data: { ...user },
     });
-  }
-
-  async CreateUser(user: User): Promise<User> {
-    return this.prisma.user.create({ data: user });
   }
 }

@@ -16,10 +16,10 @@ export const multerOptionsFactory = (
     },
   });
   return {
-    dest: './user',
     storage: multerS3({
       s3,
       bucket: configService.get('AWS_BUCKET_NAME'),
+      acl: 'public-read',
       key(_req, file, done) {
         const ext = path.extname(file.originalname);
         const basename = path.basename(file.originalname, ext);
