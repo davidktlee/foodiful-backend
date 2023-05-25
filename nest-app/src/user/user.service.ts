@@ -50,6 +50,7 @@ export class UserService {
       const user = await this.userRepository.getUserById(id);
       if (!user) throw new NotFoundException('삭제하실 회원이 없습니다');
       else {
+        await this.deleteUserProfile(user.profile);
         await this.userRepository.deleteUser(id);
         return { user, message: '회원 삭제가 완료되었습니다.' };
       }
@@ -64,7 +65,6 @@ export class UserService {
   ): Promise<{ createdUser: User; message: string }> {
     try {
       const { filePath, key } = await this.uploadUserProfile(file);
-      console.log(key);
       const hashedUserData = await this.transformPassword(userData.password);
       const createdUser = await this.userRepository.createUser({
         ...userData,
@@ -90,6 +90,23 @@ export class UserService {
     return { filePath: file.location, key: file.key };
   }
 
+  async deleteUserProfile(key: string) {
+    const s3 = new S3({
+      region: this.config.get('AWS_BUCKET_REGION'),
+      credentials: {
+        accessKeyId: this.config.get('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.config.get('AWS_SECRET_ACCESS_KEY'),
+      },
+    });
+    const startKey = key.indexOf('user');
+    console.log(startKey);
+    const res = await s3.deleteObject({
+      Bucket: this.config.get('AWS_BUCKET_NAME'),
+      Key: key.slice(startKey, key.length),
+    });
+    return res;
+  }
+
   async transformPassword(password): Promise<User['password']> {
     password = await bcrypt.hash(password, 10);
     return password;
@@ -106,23 +123,11 @@ export class UserService {
         throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
       else {
         if (user.profile !== updateUserData.profile) {
-          const s3 = new S3({
-            region: this.config.get('AWS_BUCKET_REGION'),
-            credentials: {
-              accessKeyId: this.config.get('AWS_ACCESS_KEY_ID'),
-              secretAccessKey: this.config.get('AWS_SECRET_ACCESS_KEY'),
-            },
+          await this.deleteUserProfile(user.profile);
+          const updatedUser = await this.userRepository.updateUser(id, {
+            ...updateUserData,
+            profile: file,
           });
-
-          const updatedUser = await s3.deleteObject({
-            Bucket: this.config.get('AWS_BUCKET_NAME'),
-            Key: `user/KakaoTalk_Photo_2022-10-28-21-50-33-1685016520368.jpeg`,
-          });
-          console.log(updatedUser);
-          // const updatedUser = await this.userRepository.updateUser(id, {
-          //   ...updateUserData,
-          //   profile: file,
-          // });
           return { updatedUser, message: '수정이 완료되었습니다.' };
         }
       }
