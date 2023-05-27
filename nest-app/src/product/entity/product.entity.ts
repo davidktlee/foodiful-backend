@@ -1,9 +1,10 @@
 export class Product {
-  id: string;
+  id: number;
   name: string;
   price: number;
   discount: number;
   description: string;
-  img?: string;
-  tags: string[];
+  descImg?: string[];
+  categories: string[];
+  deliver: boolean;
 }

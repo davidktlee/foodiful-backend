@@ -19,7 +19,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -27,9 +26,7 @@ import { UserService } from './user.service';
 @Controller('user')
 @ApiTags('user')
 export class UserController {
-  constructor(private userService: UserService) {
-    this.userService = userService;
-  }
+  constructor(private userService: UserService) {}
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })

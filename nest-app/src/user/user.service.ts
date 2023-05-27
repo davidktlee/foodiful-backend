@@ -64,7 +64,17 @@ export class UserService {
     file,
   ): Promise<{ createdUser: User; message: string }> {
     try {
-      const { filePath, key } = await this.uploadUserProfile(file);
+      // const results = await Promise.all([
+      //   this.uploadUserProfile(file),
+      //   this.transformPassword(userData.password),
+      //   this.userRepository.createUser({
+      //     ...userData,
+      //     profile: results[0],
+      //     password: results[1],
+      //   }),
+      // ]);
+
+      const filePath = await this.uploadUserProfile(file);
       const hashedUserData = await this.transformPassword(userData.password);
       const createdUser = await this.userRepository.createUser({
         ...userData,
@@ -87,7 +97,7 @@ export class UserService {
     if (!file) {
       throw new BadRequestException('파일을 업로드해주세요.');
     }
-    return { filePath: file.location, key: file.key };
+    return file.location;
   }
 
   async deleteUserProfile(key: string) {
@@ -99,12 +109,10 @@ export class UserService {
       },
     });
     const startKey = key.indexOf('user');
-    console.log(startKey);
-    const res = await s3.deleteObject({
+    await s3.deleteObject({
       Bucket: this.config.get('AWS_BUCKET_NAME'),
       Key: key.slice(startKey, key.length),
     });
-    return res;
   }
 
   async transformPassword(password): Promise<User['password']> {
@@ -122,14 +130,24 @@ export class UserService {
       if (!user)
         throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
       else {
-        if (user.profile !== updateUserData.profile) {
-          await this.deleteUserProfile(user.profile);
-          const updatedUser = await this.userRepository.updateUser(id, {
-            ...updateUserData,
-            profile: file,
-          });
-          return { updatedUser, message: '수정이 완료되었습니다.' };
+        // user와 updateUserData 비교 로직
+        for (const key in user) {
+          if (user.hasOwnProperty(key) && updateUserData.hasOwnProperty(key)) {
+            if (user[key] !== updateUserData[key]) {
+              user[key] = updateUserData[key];
+            }
+          }
         }
+        // 업데이트 할 파일이 있다면 기존 파일 삭제 후 새로운 파일 업로드
+        if (file) {
+          await this.deleteUserProfile(user.profile);
+          file = await this.uploadUserProfile(file);
+        }
+        const updatedUser = await this.userRepository.updateUser(id, {
+          ...user,
+          profile: file,
+        });
+        return { updatedUser, message: '수정이 완료되었습니다.' };
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);

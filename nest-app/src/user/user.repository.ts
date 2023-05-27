@@ -22,7 +22,7 @@ export class UserRepository {
 
   //
 
-  async createUser(user: CreateUserDto): Promise<User> {
+  async createUser(user): Promise<User> {
     return await this.prisma.user.create({
       data: {
         ...user,
@@ -36,7 +36,7 @@ export class UserRepository {
     });
   }
 
-  async updateUser(id: number, user: UpdateUserDto): Promise<User> {
+  async updateUser(id: number, user): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: { ...user },

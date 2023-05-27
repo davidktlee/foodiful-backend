@@ -4,26 +4,33 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) {
+    this.productService = productService;
+  }
   // 전체 상품 얻기
   @Get()
-  getProducts(): Product[] {
+  getProducts(): Promise<{ products: Product[] }> {
     return this.productService.getProducts();
   }
   // 이름으로 상품 얻기
   @Get()
-  searchProduct(@Query('name') searchingProduct: string) {
-    return this.productService.getProduct(searchingProduct);
+  searchProduct(@Query('name') name: string) {
+    return this.productService.getProductByName(name);
   }
   // id로 상품 얻기
   @Get(':id')
@@ -32,17 +39,21 @@ export class ProductController {
   }
 
   @Post()
-  addProduct(@Body() productData: CreateProductDto) {
-    return this.productService.addProduct(productData);
+  @UseInterceptors(FilesInterceptor('descImg', 10))
+  addProduct(
+    @Body() productData: CreateProductDto,
+    @UploadedFiles() files,
+  ): Promise<Product> {
+    return this.productService.addProduct(productData, files);
   }
 
   @Delete(':id')
-  deleteProduct(@Param('id') productId: Product['id']) {
+  deleteProduct(@Param('id') productId: number) {
     return this.productService.deleteProduct(productId);
   }
 
-  @Patch(':id')
-  updateProduct(@Param('id') productId: string, @Body() updatedProduct) {
-    return this.productService.updateProduct(productId, updatedProduct);
-  }
+  // @Patch(':id')
+  // updateProduct(@Param('id') productId: number, @Body() updatedProduct) {
+  //   return this.productService.updateProduct(productId, updatedProduct);
+  // }
 }

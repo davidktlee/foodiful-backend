@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
-import { multerOptionsFactory } from 'src/common/multer.options';
+import { MulterOptionsFactory } from 'src/common/multer.options';
 import { PrismaService } from 'src/prisma.service';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
@@ -11,7 +11,9 @@ import { UserService } from './user.service';
   imports: [
     MulterModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: multerOptionsFactory,
+      useFactory: (configService: ConfigService) => {
+        return MulterOptionsFactory(configService, 'user');
+      },
       inject: [ConfigService],
     }),
   ],

@@ -5,8 +5,9 @@ import multerS3 from 'multer-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import path from 'path';
 
-export const multerOptionsFactory = (
+export const MulterOptionsFactory = (
   configService: ConfigService,
+  adress: string,
 ): MulterOptions => {
   const s3 = new S3Client({
     region: configService.get('AWS_BUCKET_REGION'),
@@ -23,7 +24,7 @@ export const multerOptionsFactory = (
       key(_req, file, done) {
         const ext = path.extname(file.originalname);
         const basename = path.basename(file.originalname, ext);
-        done(null, `user/${basename}-${Date.now()}${ext}`);
+        done(null, `${adress}/${basename}-${Date.now()}${ext}`);
       },
     }),
     limits: { fileSize: 10 * 1024 * 1024 },
