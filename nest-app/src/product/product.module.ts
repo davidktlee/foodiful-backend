@@ -11,9 +11,8 @@ import { ProductService } from './product.service';
   imports: [
     MulterModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        return MulterOptionsFactory(configService, 'product');
-      },
+      useFactory: (configService: ConfigService) =>
+        MulterOptionsFactory(configService, 'product'),
       inject: [ConfigService],
     }),
   ],

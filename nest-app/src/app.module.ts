@@ -4,14 +4,14 @@ import { ProductModule } from './product/product.module';
 import { ReservationModule } from './reservation/reservation.module';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
-import { ProductController } from './product/product.controller';
-// import { UserRepository } from './user/user.repository';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     UserModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ProductModule,
+    AuthModule,
   ],
   controllers: [AppController],
   // providers: [UserRepository],
