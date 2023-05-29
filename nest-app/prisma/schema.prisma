@@ -15,6 +15,16 @@ model User {
   password          String
   reservedClasses   Class[]
   purchasedProducts Product[]
+  accounts Account?
+  reviews Review[]
+}
+
+model Account {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: userId, references: id)
+  userId Int @unique
+  token String
+  
 }
 
 model Class {
@@ -40,4 +50,13 @@ model Product {
   categories  String[]
   user        User?    @relation(fields: userId, references: [id])
   userId      Int?
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  createdAt DateTime
+  isSecret Boolean @default(false)
+  content String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
 }

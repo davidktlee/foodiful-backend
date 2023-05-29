@@ -6,13 +6,16 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
-import { validate } from 'class-validator';
 import { UserRepository } from '../user/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private userRepository: UserRepository,
+    private jwtService: JwtService,
+  ) {}
 
   // async login() {}
   async signUp(
@@ -20,10 +23,11 @@ export class AuthService {
   ): Promise<{ createdUser: User; message: string }> {
     try {
       const values = Object.values(userData);
-      if (values.length !== Object.keys(userData).length) {
-        throw new NotFoundException('정보를 입력해주세요');
+      if (values.length < 4) {
+        throw new NotFoundException('정보를 전체 다 입력해주세요');
       } else {
         const hashedUserData = await this.transformPassword(userData.password);
+        const accessToken = await this.jwtService.sign(userData.name);
         const createdUser = await this.userRepository.createUser({
           ...userData,
           password: hashedUserData,
@@ -36,6 +40,17 @@ export class AuthService {
       }
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async loginUser(userData) {
+    try {
+      const user = await this.userRepository.getUserById(userData.id);
+      if (!user) throw new NotFoundException('회원 정보가 없습니다');
+      const comparedPassword = await bcrypt.compare(
+        user.password,
+        userData.password,
+      );
+    } catch (error) {}
   }
 
   async transformPassword(password): Promise<User['password']> {
