@@ -11,7 +11,6 @@ import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { User } from '@prisma/client';
 import { UserRepository } from './user.repository';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
-import { S3 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -35,9 +34,9 @@ export class UserService {
     }
   }
 
-  async getUserById(id: number): Promise<User> {
+  async getUserByUserId(userId: string): Promise<User> {
     try {
-      const user = await this.userRepository.getUserById(id);
+      const user = await this.userRepository.getUserByUserId(userId);
       if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
       return user;
     } catch (error) {

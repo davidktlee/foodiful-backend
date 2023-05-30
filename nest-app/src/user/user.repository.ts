@@ -12,10 +12,16 @@ export class UserRepository {
   async getUser(): Promise<User[]> {
     return this.prisma.user.findMany();
   }
-
   async getUserById(id: number): Promise<User> {
     return this.prisma.user.findUnique({
       where: { id },
+      // include: { product: true },
+    });
+  }
+
+  async getUserByUserId(userId: string): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: { userId },
       // include: { product: true },
     });
   }

@@ -27,7 +27,7 @@ export class AuthService {
         throw new NotFoundException('정보를 전체 다 입력해주세요');
       } else {
         const hashedUserData = await this.transformPassword(userData.password);
-        const accessToken = await this.jwtService.sign(userData.name);
+        const accessToken = await this.jwtService.sign(userData.userId);
         const createdUser = await this.userRepository.createUser({
           ...userData,
           password: hashedUserData,
@@ -44,7 +44,7 @@ export class AuthService {
 
   async loginUser(userData) {
     try {
-      const user = await this.userRepository.getUserById(userData.id);
+      const user = await this.userRepository.getUserByUserId(userData.userId);
       if (!user) throw new NotFoundException('회원 정보가 없습니다');
       const comparedPassword = await bcrypt.compare(
         user.password,
