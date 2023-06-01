@@ -33,6 +33,15 @@ export class UserService {
       throw new InternalServerErrorException(error.message);
     }
   }
+  async getUserById(id: number): Promise<User> {
+    try {
+      const user = await this.userRepository.getUserById(id);
+      if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async getUserByUserId(userId: string): Promise<User> {
     try {
