@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Redirect,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import {
@@ -7,31 +15,38 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { Response } from 'express';
 import { UserEntity } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
-
+import { GetUser } from './get-user.decorator';
+import { LocalAuthGuard } from './guards/local-guard';
+import bcrypt from 'bcrypt';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/login')
-  @UseGuards(AuthGuard())
-  login(@Req() req) {
-    console.log(req);
+  // @UseGuards(LocalAuthGuard)
+  async login(@Body() userData, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, ...accessOption } = await this.authService.loginUser(
+      userData,
+    );
+    res.cookie('jwt', accessToken, accessOption);
+    return accessToken;
   }
 
   @Post('/signup')
   @ApiCreatedResponse({ type: UserEntity })
   @ApiConflictResponse({})
+  // @Redirect('/')
   async signUp(@Body() userData) {
-    return this.authService.signUp(userData);
+    const { userId, name, phone } = await this.authService.signUp(userData);
+    return { userId, name, phone };
   }
-  //   userData,)
-  // async signUp(
-  //   @Body()
-  //   userData,
-  // ): Promise<{ createdUser: User; message: string }> {
-  //   return this.authService.signUp(userData);
-  // }
+  @Get('/authenticate')
+  @UseGuards(LocalAuthGuard)
+  isAuthenticated(@GetUser() user) {
+    return user;
+  }
 }

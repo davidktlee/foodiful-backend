@@ -9,8 +9,10 @@ import {
   Post,
   Query,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,6 +26,7 @@ export class ProductController {
   }
   // 전체 상품 얻기
   @Get()
+  @UseGuards(AuthGuard())
   getProducts(): Promise<{ products: Product[] }> {
     return this.productService.getProducts();
   }

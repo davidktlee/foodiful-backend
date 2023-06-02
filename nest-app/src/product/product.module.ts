@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
+import { AuthModule } from 'src/auth/auth.module';
 import { MulterOptionsFactory } from 'src/common/multer.options';
 import { PrismaService } from 'src/prisma.service';
 import { ProductController } from './product.controller';
@@ -15,6 +16,7 @@ import { ProductService } from './product.service';
         MulterOptionsFactory(configService, 'product'),
       inject: [ConfigService],
     }),
+    AuthModule,
   ],
   controllers: [ProductController],
   providers: [ProductService, PrismaService, ProductRepository],

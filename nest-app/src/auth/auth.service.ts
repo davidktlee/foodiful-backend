@@ -3,18 +3,21 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserRepository } from '../user/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userRepository: UserRepository,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   // async login() {}
@@ -44,19 +47,45 @@ export class AuthService {
   //   }
   // }
   async signUp(userData) {
-    const accessToken = await this.jwtService.sign({ userId: userData.userId });
-    return accessToken;
+    const hashedPassword = await this.transformPassword(userData.password);
+    const { userId, name, phone } = await this.userRepository.createUser({
+      ...userData,
+      password: hashedPassword,
+    });
+    return { userId, name, phone };
+  }
+
+  async createAccessToken(userId) {
+    const accessToken = this.jwtService.sign(
+      { userId },
+      {
+        expiresIn: 10000,
+      },
+    );
+
+    return {
+      accessToken,
+      path: '/',
+      httpOnly: true,
+      maxAge: 10000,
+    };
   }
 
   async loginUser(userData) {
     try {
       const user = await this.userRepository.getUserByUserId(userData.userId);
-      if (!user) throw new NotFoundException('회원 정보가 없습니다');
-      const comparedPassword = await bcrypt.compare(
-        user.password,
+      const checkPassword = await bcrypt.compare(
         userData.password,
+        user.password,
       );
-    } catch (error) {}
+      if (!checkPassword) {
+        throw new UnauthorizedException('비밀번호 불일치');
+      }
+      const accessToken = this.createAccessToken(userData.userId);
+      return accessToken;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async transformPassword(password): Promise<User['password']> {
