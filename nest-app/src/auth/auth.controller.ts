@@ -19,21 +19,24 @@ import { Response } from 'express';
 import { UserEntity } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { GetUser } from './get-user.decorator';
-import { LocalAuthGuard } from './guards/local-guard';
+import { LocalAuthGuard } from './guards/local.guard';
 import bcrypt from 'bcrypt';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/login')
-  // @UseGuards(LocalAuthGuard)
+  // @UseGuards(JwtRefreshGuard)
   async login(@Body() userData, @Res({ passthrough: true }) res: Response) {
-    const { accessToken, ...accessOption } = await this.authService.loginUser(
-      userData,
-    );
+    const {
+      cookieWithAccessToken: { accessToken, ...accessOption },
+      cookieWithRefreshToken: { refreshToken, ...refreshOption },
+    } = await this.authService.loginUser(userData);
     res.cookie('jwt', accessToken, accessOption);
-    return accessToken;
+    res.cookie('Refresh', refreshToken, refreshOption);
+    return { accessToken, refreshToken };
   }
 
   @Post('/signup')

@@ -21,10 +21,9 @@ model User {
 
 model Account {
   id           Int      @id @default(autoincrement())
-  user         User     @relation(fields: [userId], references:[id], onDelete: Cascade)
-  userId       Int      @unique
-  accessToken  String
-  refreshToken String
+  user         User     @relation(fields: [userID], references:[userId], onDelete: Cascade)
+  userID       String      @unique
+  refreshToken String?
 }
 
 model Class {

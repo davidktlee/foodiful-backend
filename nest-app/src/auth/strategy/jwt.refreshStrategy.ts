@@ -17,7 +17,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request) => {
-          return request.cookies.refresh;
+          return request?.cookies?.refresh;
         },
       ]),
       secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET_KEY'),
@@ -25,7 +25,10 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
   async validate(req, payload) {
-    const refreshToken = req.cookies.refresh;
-    // refresh token 추가 로직
+    const refreshToken = req?.cookies?.refresh;
+    return this.authService.getUserIfRefreshTokenMatches(
+      refreshToken,
+      payload.id,
+    );
   }
 }

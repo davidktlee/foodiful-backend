@@ -55,7 +55,37 @@ export class AuthService {
     return { userId, name, phone };
   }
 
-  async createAccessToken(userId) {
+  async loginUser(userData) {
+    try {
+      const user = await this.userRepository.getUserByUserId(userData.userId);
+      const checkPassword = await this.checkPassword(
+        user.password,
+        userData.password,
+      );
+      if (!checkPassword) {
+        throw new UnauthorizedException('비밀번호 불일치');
+      }
+      const cookieWithAccessToken = await this.getCookieWithAccessToken(
+        userData.userId,
+      );
+      const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
+        userData.userId,
+      );
+      // const hashedRefreshToken = await this.setCurrentRefreshToken(
+      //   refreshToken.refreshToken,
+      //   user.id,
+      // );
+      await this.userRepository.loginUser({
+        ...userData,
+        refreshToken: cookieWithRefreshToken.refreshToken,
+      });
+      return { cookieWithAccessToken, cookieWithRefreshToken };
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getCookieWithAccessToken(userId) {
     const accessToken = this.jwtService.sign(
       { userId },
       {
@@ -71,21 +101,42 @@ export class AuthService {
     };
   }
 
-  async loginUser(userData) {
-    try {
-      const user = await this.userRepository.getUserByUserId(userData.userId);
-      const checkPassword = await bcrypt.compare(
-        userData.password,
-        user.password,
-      );
-      if (!checkPassword) {
-        throw new UnauthorizedException('비밀번호 불일치');
-      }
-      const accessToken = this.createAccessToken(userData.userId);
-      return accessToken;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+  async getCookieWithRefreshToken(userId) {
+    const refreshToken = this.jwtService.sign(
+      { userId },
+      {
+        secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET_KEY'),
+        expiresIn: 604800,
+      },
+    );
+    return {
+      refreshToken,
+      path: '/',
+      httpOnly: true,
+      maxAge: 604800 * 1000,
+    };
+  }
+
+  // async setCurrentRefreshToken(refreshToken: string, id: number) {
+  //   const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+  //   await this.userRepository.updateRefreshToken(id, currentHashedRefreshToken);
+  // }
+  async getUserIfRefreshTokenMatches(refreshToken, id) {
+    const user = await this.userRepository.getUserById(id);
+    const checkRefreshToken = await bcrypt.compare(
+      refreshToken,
+      user.accounts.refreshToken,
+    );
+    if (checkRefreshToken) {
+      return user;
     }
+  }
+
+  // async removeRefreshToken(id: number) {}
+
+  async checkPassword(userPassword, comparePassword) {
+    console.log(userPassword, comparePassword);
+    return await bcrypt.compare(comparePassword, userPassword);
   }
 
   async transformPassword(password): Promise<User['password']> {

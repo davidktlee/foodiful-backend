@@ -6,4 +6,8 @@ export class UserEntity implements User {
   userId: string;
   phone: string;
   password: string;
+  accounts: {
+    refreshToken: string;
+    accessToken: string;
+  };
 }
