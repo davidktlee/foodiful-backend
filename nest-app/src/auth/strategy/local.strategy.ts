@@ -25,9 +25,9 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   async validate(payload) {
     const { userId, password } = payload;
     const user = await this.userRepository.getUserByUserId(userId);
-    const checkPassword = await this.authService.checkPassword(
-      user.password,
+    const checkPassword = await this.authService.compare(
       password,
+      user.password,
     );
 
     if (!user) {

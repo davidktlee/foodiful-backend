@@ -11,8 +11,8 @@ export class JwtRefreshStrategy extends PassportStrategy(
   'jwt-refresh-token',
 ) {
   constructor(
-    private configService: ConfigService,
-    private authService: AuthService,
+    private readonly configService: ConfigService,
+    private readonly authService: AuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -28,7 +28,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     const refreshToken = req?.cookies?.refresh;
     return this.authService.getUserIfRefreshTokenMatches(
       refreshToken,
-      payload.id,
+      payload.userId,
     );
   }
 }

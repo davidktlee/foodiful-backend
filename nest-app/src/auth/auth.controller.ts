@@ -21,21 +21,22 @@ import { AuthService } from './auth.service';
 import { GetUser } from './get-user.decorator';
 import { LocalAuthGuard } from './guards/local.guard';
 import bcrypt from 'bcrypt';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { JwtGuard } from './guards/jwt.guard';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/login')
-  // @UseGuards(JwtRefreshGuard)
   async login(@Body() userData, @Res({ passthrough: true }) res: Response) {
     const {
       cookieWithAccessToken: { accessToken, ...accessOption },
       cookieWithRefreshToken: { refreshToken, ...refreshOption },
     } = await this.authService.loginUser(userData);
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    // res.setHeader('Access-Control-Allow-Origin', '*');
     res.cookie('jwt', accessToken, accessOption);
-    res.cookie('Refresh', refreshToken, refreshOption);
+    res.cookie('refresh', refreshToken, refreshOption);
     return { accessToken, refreshToken };
   }
 
@@ -48,8 +49,19 @@ export class AuthController {
     return { userId, name, phone };
   }
   @Get('/authenticate')
-  @UseGuards(LocalAuthGuard)
-  isAuthenticated(@GetUser() user) {
-    return user;
+  @UseGuards(JwtGuard)
+  isAuthenticated(@Res({ passthrough: true }) res: Response) {
+    return 'success';
+  }
+
+  // @
+  // updateRefreshToken() => {}
+
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    const { accessOption, refreshOption } =
+      await this.authService.removeCookieWithRefreshToken();
+    res.cookie('jwt', '', accessOption);
+    res.cookie('refresh', '', refreshOption);
   }
 }

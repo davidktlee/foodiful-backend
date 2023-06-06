@@ -47,7 +47,7 @@ export class AuthService {
   //   }
   // }
   async signUp(userData) {
-    const hashedPassword = await this.transformPassword(userData.password);
+    const hashedPassword = await this.transform(userData.password);
     const { userId, name, phone } = await this.userRepository.createUser({
       ...userData,
       password: hashedPassword,
@@ -58,9 +58,9 @@ export class AuthService {
   async loginUser(userData) {
     try {
       const user = await this.userRepository.getUserByUserId(userData.userId);
-      const checkPassword = await this.checkPassword(
-        user.password,
+      const checkPassword = await this.compare(
         userData.password,
+        user.password,
       );
       if (!checkPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
@@ -89,19 +89,20 @@ export class AuthService {
     const accessToken = this.jwtService.sign(
       { userId },
       {
-        expiresIn: 10000,
+        expiresIn: 100000,
       },
     );
 
     return {
       accessToken,
       path: '/',
+      domain: 'http://localhost:3001',
       httpOnly: true,
-      maxAge: 10000,
+      maxAge: 100000 * 1000,
     };
   }
 
-  async getCookieWithRefreshToken(userId) {
+  getCookieWithRefreshToken(userId) {
     const refreshToken = this.jwtService.sign(
       { userId },
       {
@@ -112,35 +113,69 @@ export class AuthService {
     return {
       refreshToken,
       path: '/',
+      domain: 'http://localhost:3001',
       httpOnly: true,
       maxAge: 604800 * 1000,
     };
+  }
+
+  removeCookieWithRefreshToken() {
+    return {
+      accessOption: {
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+      refreshOption: {
+        path: '/',
+        httpOnly: true,
+        maxAge: 0,
+      },
+    };
+  }
+
+  // validAccessToken(accessToken) {
+  //   try {
+  //     const verified = this.jwtService.verify(
+  //       accessToken,
+  //       this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY'),
+  //     );
+  //     return verified;
+  //   } catch (error) {
+  //     return 'error발생';
+  //   }
+  // }
+
+  async renewAccessToken(refreshToken, userId) {
+    const user = await this.userRepository.getUserByUserId(userId);
+    const res = await this.getUserIfRefreshTokenMatches(
+      refreshToken,
+      user.accounts.refreshToken,
+    );
+    if (res) {
+      return this.getCookieWithAccessToken(user.userId);
+    }
   }
 
   // async setCurrentRefreshToken(refreshToken: string, id: number) {
   //   const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
   //   await this.userRepository.updateRefreshToken(id, currentHashedRefreshToken);
   // }
-  async getUserIfRefreshTokenMatches(refreshToken, id) {
-    const user = await this.userRepository.getUserById(id);
-    const checkRefreshToken = await bcrypt.compare(
-      refreshToken,
-      user.accounts.refreshToken,
-    );
-    if (checkRefreshToken) {
+  async getUserIfRefreshTokenMatches(refreshToken, userId) {
+    const user = await this.userRepository.getUserByUserId(userId);
+    if (refreshToken === user.accounts.refreshToken) {
       return user;
     }
   }
 
   // async removeRefreshToken(id: number) {}
 
-  async checkPassword(userPassword, comparePassword) {
-    console.log(userPassword, comparePassword);
-    return await bcrypt.compare(comparePassword, userPassword);
+  async compare(willCompare, original) {
+    return await bcrypt.compare(willCompare, original);
   }
 
-  async transformPassword(password): Promise<User['password']> {
-    password = await bcrypt.hash(password, 10);
-    return password;
+  async transform(willHash): Promise<User['password']> {
+    willHash = await bcrypt.hash(willHash, 10);
+    return willHash;
   }
 }
