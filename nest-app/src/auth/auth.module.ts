@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { PrismaService } from 'src/prisma.service';
@@ -19,6 +19,7 @@ import { LocalStrategy } from './strategy/local.strategy';
         expiresIn: 60,
       },
     }),
+    CacheModule.register({ ttl: 60000 }),
   ],
   controllers: [AuthController],
   providers: [

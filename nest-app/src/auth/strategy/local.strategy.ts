@@ -4,16 +4,18 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserRepository } from 'src/user/user.repository';
 import { AuthService } from '../auth.service';
 import { compare } from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     private userRepository: UserRepository,
     private authService: AuthService,
+    private configService: ConfigService,
   ) {
     super({
       // module에 등록한 secret 과 비교
-      secretOrKey: process.env.JWT_ACCESS_TOKEN_SECRET_KEY,
+      secretOrKey: configService.get('JWT_ACCESS_TOKEN_SECRET_KEY'),
       // header에 bearer token 부분에서 jwt 토큰을 추출할 것이라는 명시
       jwtFromRequest: ExtractJwt.fromExtractors([(req) => req.body]),
       passReqToCallback: true,

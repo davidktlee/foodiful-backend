@@ -1,4 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { validate } from 'class-validator';
@@ -24,11 +30,17 @@ export class JwtRefreshStrategy extends PassportStrategy(
       passReqToCallback: true,
     });
   }
-  async validate(req, payload) {
-    const refreshToken = req?.cookies?.refresh;
-    return this.authService.getUserIfRefreshTokenMatches(
+  async validate(payload, req) {
+    const refreshToken = payload?.cookies?.refresh;
+    // console.log('payload', payload.cookies.refresh);
+    // console.log('req', req);
+
+    const user = this.authService.getUserIfRefreshTokenMatches(
       refreshToken,
-      payload.userId,
+      req.userId,
     );
+    if (!user) {
+      return new ForbiddenException('Refresh token invalid');
+    } else return (req.user = user);
   }
 }
