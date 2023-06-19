@@ -1,11 +1,9 @@
 import {
   CacheInterceptor,
   CACHE_MANAGER,
-  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +14,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import CryptoJS from 'crypto-js';
-import axios from 'axios';
 import { Cache } from 'cache-manager';
 
 @Injectable()
@@ -55,7 +52,7 @@ export class AuthService {
     await this.cacheManager.del(phoneNumber);
     let verifyCode = '';
     for (let i = 1; i < 7; i++) {
-      verifyCode += Number(Math.random() * 10).toFixed(0);
+      verifyCode += Math.floor(Math.random() * 10);
     }
 
     const body = {
@@ -77,17 +74,18 @@ export class AuthService {
         'x-ncp-apigw-signature-v2': this.makeSignature(),
       },
     };
-    try {
-      const res = await axios.post(
-        this.configService.get('NCP_URI'),
-        body,
-        options,
-      );
-      console.log(res);
-    } catch (error) {
-      console.log(error.response.data);
-      throw new InternalServerErrorException('서버 에러');
-    }
+    // try {
+    //   const res = await axios.post(
+    //     this.configService.get('NCP_URI'),
+    //     body,
+    //     options,
+    //   );
+    //   console.log(res);
+    // } catch (error) {
+    //   console.log(error);
+    //   throw new InternalServerErrorException('서버 에러');
+    // }
+
     await this.cacheManager.set(phoneNumber, verifyCode, 180000);
   }
 
@@ -95,39 +93,13 @@ export class AuthService {
     const cacheVerifyNum = await this.cacheManager.get(phoneNumber);
     if (!cacheVerifyNum) {
       throw new Error('인증 번호가 만료되었습니다');
-    } else if (cacheVerifyNum === verifyCode) {
+    } else if (Number(cacheVerifyNum) == verifyCode) {
       return true;
     } else {
       throw new UnauthorizedException('인증 번호가 일치하지 않습니다');
     }
   }
 
-  // async login() {}
-  // async signUp(
-  //   userData: CreateUserDto,
-  // ): Promise<{ createdUser: User; message: string }> {
-  //   try {
-  //     const values = Object.values(userData);
-  //     if (values.length < 4) {
-  //       throw new NotFoundException('정보를 전체 다 입력해주세요');
-  //     } else {
-  //       const hashedUserData = await this.transformPassword(userData.password);
-  //       const accessToken = await this.jwtService.sign(userData.userId, {
-  //         expiresIn: '7d',
-  //       });
-  //       const createdUser = await this.userRepository.createUser({
-  //         ...userData,
-  //         password: hashedUserData,
-  //       });
-  //       return { createdUser, message: '회원가입이 완료되었습니다.' };
-  //     }
-  //   } catch (error) {
-  //     if (error.code === 'P2002') {
-  //       throw new ConflictException('이미 존재하는 아이디 입니다.');
-  //     }
-  //     throw new InternalServerErrorException(error.message);
-  //   }
-  // }
   async signUp(userData) {
     const hashedPassword = await this.transform(userData.password);
     const { userId, name, phone } = await this.userRepository.createUser({

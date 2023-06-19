@@ -44,13 +44,8 @@ export class AuthController {
   @ApiConflictResponse({})
   // @Redirect('/')
   async signUp(@Body() userData): Promise<any> {
-    const res = await this.authService.sendSMS(userData.phone);
-    // const { userId, name, phone } = await this.authService.signUp(userData);
-    // return { userId, name, phone, res };
-    /**
-     * 지울 것
-     */
-    return res;
+    const { userId, name, phone } = await this.authService.signUp(userData);
+    return { userId, name, phone };
   }
   @Get('/authenticate')
   @UseGuards(JwtGuard)
@@ -65,7 +60,7 @@ export class AuthController {
 
   @Post('/checkphone/verify')
   async verifyPhone(@Body() data): Promise<any> {
-    const res = await this.authService.checkSMS(data);
+    const res = await this.authService.checkSMS(data.data);
     if (res) return true;
   }
 
