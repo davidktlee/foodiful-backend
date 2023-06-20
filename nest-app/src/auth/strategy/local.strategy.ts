@@ -25,8 +25,8 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   // 있다면 유저 객체를 반환
   // return 값은 @useGuard(local)를 이용한 모든 요청의 req 객체에 들어감
   async validate(payload) {
-    const { userId, password } = payload;
-    const user = await this.userRepository.getUserByUserId(userId);
+    const { email, password } = payload;
+    const user = await this.userRepository.getUserByUserEmail(email);
     const checkPassword = await this.authService.compare(
       password,
       user.password,

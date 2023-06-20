@@ -43,9 +43,9 @@ export class UserService {
     }
   }
 
-  async getUserByUserId(userId: string): Promise<User> {
+  async getUserByUserEmail(email: string): Promise<User> {
     try {
-      const user = await this.userRepository.getUserByUserId(userId);
+      const user = await this.userRepository.getUserByUserEmail(email);
       if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
       return user;
     } catch (error) {

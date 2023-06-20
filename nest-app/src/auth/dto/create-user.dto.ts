@@ -15,9 +15,8 @@ export class CreateUserDto {
   readonly password: string;
 
   @IsString()
-  @MinLength(3)
-  @MaxLength(10)
-  readonly userId: string;
+  @Matches(/^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/)
+  readonly email: string;
 
   @IsString()
   readonly phone: string;

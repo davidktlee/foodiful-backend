@@ -15,23 +15,23 @@ export class UserRepository {
   async getUserById(id: number) {
     return this.prisma.user.findUnique({
       where: { id },
-      include: { accounts: true },
+      include: { account: true },
     });
   }
 
-  async getUserByUserId(userId: string) {
+  async getUserByUserEmail(email: string) {
     return this.prisma.user.findUnique({
-      where: { userId },
-      include: { accounts: true },
+      where: { email },
+      include: { account: true },
       // include: { product: true },
     });
   }
 
   async createUser(user: CreateUserDto): Promise<User> {
-    const { userId, name, phone, password } = user;
+    const { email, name, phone, password } = user;
     return await this.prisma.user.create({
       data: {
-        userId,
+        email,
         name,
         phone,
         password,
@@ -40,11 +40,11 @@ export class UserRepository {
   }
 
   async loginUser(userData: LoginUserDto) /*Promise<User>*/ {
-    const { userId, refreshToken } = userData;
+    const { email, refreshToken } = userData;
     return await this.prisma.user.update({
-      where: { userId },
+      where: { email },
       data: {
-        accounts: {
+        account: {
           upsert: {
             create: {
               refreshToken,
@@ -56,7 +56,7 @@ export class UserRepository {
         },
       },
       include: {
-        accounts: true,
+        account: true,
       },
     });
   }

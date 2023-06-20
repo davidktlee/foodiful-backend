@@ -15,13 +15,10 @@ import {
   ApiCreatedResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+
 import { Request, Response } from 'express';
 import { UserEntity } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
-import { GetUser } from './get-user.decorator';
-import { LocalAuthGuard } from './guards/local.guard';
-import bcrypt from 'bcrypt';
 import { JwtGuard } from './guards/jwt.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 @Controller('auth')
@@ -32,7 +29,7 @@ export class AuthController {
   @Post('/login')
   async login(@Body() userData, @Res({ passthrough: true }) res: Response) {
     const {
-      cookieWithAccessToken: { accessToken, ...accessOption },
+      accessToken,
       cookieWithRefreshToken: { refreshToken, ...refreshOption },
     } = await this.authService.loginUser(userData);
     res.cookie('refresh', refreshToken, refreshOption);
@@ -44,8 +41,8 @@ export class AuthController {
   @ApiConflictResponse({})
   // @Redirect('/')
   async signUp(@Body() userData): Promise<any> {
-    const { userId, name, phone } = await this.authService.signUp(userData);
-    return { userId, name, phone };
+    const { email, name, phone } = await this.authService.signUp(userData);
+    return { email, name, phone };
   }
   @Get('/authenticate')
   @UseGuards(JwtGuard)
@@ -72,9 +69,8 @@ export class AuthController {
 
   @Post('/logout')
   async logout(@Res({ passthrough: true }) res: Response) {
-    const { accessOption, refreshOption } =
+    const { refreshOption } =
       await this.authService.removeCookieWithRefreshToken();
-    res.cookie('jwt', '', accessOption);
     res.cookie('refresh', '', refreshOption);
   }
 }

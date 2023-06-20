@@ -102,16 +102,16 @@ export class AuthService {
 
   async signUp(userData) {
     const hashedPassword = await this.transform(userData.password);
-    const { userId, name, phone } = await this.userRepository.createUser({
+    const { email, name, phone } = await this.userRepository.createUser({
       ...userData,
       password: hashedPassword,
     });
-    return { userId, name, phone };
+    return { email, name, phone };
   }
 
   async loginUser(userData) {
     try {
-      const user = await this.userRepository.getUserByUserId(userData.userId);
+      const user = await this.userRepository.getUserByUserEmail(userData.email);
       const checkPassword = await this.compare(
         userData.password,
         user.password,
@@ -119,42 +119,34 @@ export class AuthService {
       if (!checkPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
       }
-      const cookieWithAccessToken = await this.getCookieWithAccessToken(
-        userData.userId,
-      );
+      const accessToken = await this.getAccessToken(userData.email);
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
-        userData.userId,
+        userData.email,
       );
       await this.userRepository.loginUser({
         ...userData,
         refreshToken: cookieWithRefreshToken.refreshToken,
       });
-      return { cookieWithAccessToken, cookieWithRefreshToken };
+      return { accessToken, cookieWithRefreshToken };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getCookieWithAccessToken(userId) {
+  async getAccessToken(email) {
     const accessToken = this.jwtService.sign(
-      { userId },
+      { email },
       {
         expiresIn: 100000,
       },
     );
 
-    return {
-      accessToken,
-      path: '/',
-      // domain: 'http://localhost:3001',
-      httpOnly: true,
-      maxAge: 100000,
-    };
+    return accessToken;
   }
 
-  getCookieWithRefreshToken(userId) {
+  getCookieWithRefreshToken(email) {
     const refreshToken = this.jwtService.sign(
-      { userId },
+      { email },
       {
         secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET_KEY'),
         expiresIn: 604800,
@@ -171,11 +163,6 @@ export class AuthService {
 
   removeCookieWithRefreshToken() {
     return {
-      accessOption: {
-        path: '/',
-        httpOnly: true,
-        maxAge: 0,
-      },
       refreshOption: {
         path: '/',
         httpOnly: true,
@@ -196,14 +183,14 @@ export class AuthService {
     }
   }
 
-  async renewAccessToken(refreshToken, userId) {
-    const user = await this.userRepository.getUserByUserId(userId);
+  async renewAccessToken(refreshToken, email) {
+    const user = await this.userRepository.getUserByUserEmail(email);
     const res = await this.getUserIfRefreshTokenMatches(
       refreshToken,
-      user.accounts.refreshToken,
+      user.account.refreshToken,
     );
     if (res) {
-      return this.getCookieWithAccessToken(user.userId);
+      return this.getAccessToken(user.email);
     }
   }
 
@@ -211,11 +198,9 @@ export class AuthService {
   //   const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
   //   await this.userRepository.updateRefreshToken(id, currentHashedRefreshToken);
   // }
-  async getUserIfRefreshTokenMatches(refreshToken, userId) {
-    const user = await this.userRepository.getUserByUserId(userId);
-    console.log(user.accounts.refreshToken);
-    console.log(refreshToken);
-    if (refreshToken === user.accounts.refreshToken) {
+  async getUserIfRefreshTokenMatches(refreshToken, email) {
+    const user = await this.userRepository.getUserByUserEmail(email);
+    if (refreshToken === user.account.refreshToken) {
       return user;
     }
   }
