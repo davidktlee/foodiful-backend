@@ -21,6 +21,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { CreateUserDto } from './dto/create-user.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -40,11 +41,14 @@ export class AuthController {
   @ApiCreatedResponse({ type: UserEntity })
   @ApiConflictResponse({})
   // @Redirect('/')
-  async signUp(@Body() userData): Promise<any> {
+  async signUp(
+    @Body() userData: CreateUserDto,
+  ): Promise<Pick<UserEntity, 'email' | 'phone' | 'name'>> {
     const { email, name, phone } = await this.authService.signUp(userData);
     return { email, name, phone };
   }
   @Get('/authenticate')
+  @ApiCreatedResponse({ description: 'Token 인증이 완료되었습니다.' })
   @UseGuards(JwtGuard)
   isAuthenticated(@Req() req: Request) {
     return { token: req.user };

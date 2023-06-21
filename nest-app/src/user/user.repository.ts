@@ -82,6 +82,14 @@ export class UserRepository {
     });
   }
 
+  async softDeleteUser(id: number): Promise<User> {
+    const deletedAt = Date.now().toString();
+    return this.prisma.user.update({
+      where: { id },
+      data: { deletedAt },
+    });
+  }
+
   async updateUser(id: number, user: UpdateUserDto): Promise<User> {
     return this.prisma.user.update({
       where: { id },

@@ -1,6 +1,7 @@
 import {
   CacheInterceptor,
   CACHE_MANAGER,
+  ConflictException,
   Inject,
   Injectable,
   InternalServerErrorException,
@@ -100,13 +101,17 @@ export class AuthService {
     }
   }
 
-  async signUp(userData) {
-    const hashedPassword = await this.transform(userData.password);
-    const { email, name, phone } = await this.userRepository.createUser({
-      ...userData,
-      password: hashedPassword,
-    });
-    return { email, name, phone };
+  async signUp(userData: CreateUserDto) {
+    try {
+      const hashedPassword = await this.transform(userData.password);
+      const { email, name, phone } = await this.userRepository.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+      return { email, name, phone };
+    } catch (error) {
+      throw new ConflictException('이미 존재하는 유저입니다');
+    }
   }
 
   async loginUser(userData) {
