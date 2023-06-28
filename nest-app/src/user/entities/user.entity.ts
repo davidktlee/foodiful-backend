@@ -7,8 +7,11 @@ export class UserEntity implements User {
   phone: string;
   password: string;
   createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
   accounts: {
     refreshToken: string;
+    loginAt: Date | null;
     accessToken: string;
   };
 }

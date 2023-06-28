@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
   UseInterceptors,
 } from '@nestjs/common';
@@ -86,19 +87,25 @@ export class AuthService {
     //   console.log(error);
     //   throw new InternalServerErrorException('서버 에러');
     // }
-
+    console.log(verifyCode);
     await this.cacheManager.set(phoneNumber, verifyCode, 180000);
   }
 
   async checkSMS({ phoneNumber, verifyCode }) {
     const cacheVerifyNum = await this.cacheManager.get(phoneNumber);
     if (!cacheVerifyNum) {
-      throw new Error('인증 번호가 만료되었습니다');
+      throw new UnauthorizedException('인증 번호가 만료되었습니다');
     } else if (Number(cacheVerifyNum) == verifyCode) {
       return true;
     } else {
       throw new UnauthorizedException('인증 번호가 일치하지 않습니다');
     }
+  }
+
+  async isPhoneNumberExist(phoneNumber: string) {
+    const user = await this.userRepository.checkPhone(phoneNumber);
+    if (user) throw new ConflictException('이미 존재하는 휴대폰 번호입니다.');
+    return true;
   }
 
   async signUp(userData: CreateUserDto) {
@@ -124,7 +131,7 @@ export class AuthService {
       if (!checkPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
       }
-      const accessToken = await this.getAccessToken(userData.email);
+      const accessToken = await this.getAccessToken(userData.email, user.name);
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
       );
@@ -132,20 +139,19 @@ export class AuthService {
         ...userData,
         refreshToken: cookieWithRefreshToken.refreshToken,
       });
-      return { accessToken, cookieWithRefreshToken };
+      return { accessToken, cookieWithRefreshToken, user };
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
 
-  async getAccessToken(email) {
+  getAccessToken(email, name) {
     const accessToken = this.jwtService.sign(
-      { email },
+      { email, name },
       {
-        expiresIn: 100000,
+        expiresIn: '1h',
       },
     );
-
     return accessToken;
   }
 
@@ -160,8 +166,8 @@ export class AuthService {
     return {
       refreshToken,
       path: '/',
-      // domain: 'http://localhost:3001',
       httpOnly: true,
+      // TODO: 나중에 배포하면 secure 옵션 추가해줘야 함.
       maxAge: 604800 * 1000,
     };
   }
@@ -182,31 +188,30 @@ export class AuthService {
         accessToken,
         this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY'),
       );
+      if (verified) {
+        return 'verified';
+      }
       return verified;
     } catch (error) {
-      // throw new Error(error.message);
+      throw new UnauthorizedException('토큰 검증 에러');
     }
   }
 
-  async renewAccessToken(refreshToken, email) {
-    const user = await this.userRepository.getUserByUserEmail(email);
-    const res = await this.getUserIfRefreshTokenMatches(
-      refreshToken,
-      user.account.refreshToken,
-    );
-    if (res) {
-      return this.getAccessToken(user.email);
-    }
-  }
-
-  // async setCurrentRefreshToken(refreshToken: string, id: number) {
-  //   const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-  //   await this.userRepository.updateRefreshToken(id, currentHashedRefreshToken);
-  // }
-  async getUserIfRefreshTokenMatches(refreshToken, email) {
+  async getUserIfRefreshTokenMatches(email, refreshToken) {
     const user = await this.userRepository.getUserByUserEmail(email);
     if (refreshToken === user.account.refreshToken) {
-      return user;
+      const { refreshToken: newRefreshToken, ...refreshOption } =
+        this.getCookieWithRefreshToken(user.email);
+      const newAccessToken = this.getAccessToken(user.email, user.name);
+      await this.userRepository.updateRefreshToken(user.email, newRefreshToken);
+
+      return {
+        refreshToken: newRefreshToken,
+        refreshOption,
+        refreshUser: { accessToken: newAccessToken, name: user.name },
+      };
+    } else {
+      throw new NotFoundException('인증 에러');
     }
   }
 

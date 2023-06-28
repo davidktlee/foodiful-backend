@@ -22,12 +22,12 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: ['http://localhost:3001'],
+    origin: ['http://localhost:3000'],
     credentials: true,
   });
 
   app.use(cookieParser());
-  await app.listen(3000);
+  await app.listen(5002);
 }
 
 bootstrap();

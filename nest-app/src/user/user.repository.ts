@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { iif } from 'rxjs';
 import { CreateUserDto } from 'src/auth/dto/create-user.dto';
 import { LoginUserDto } from 'src/auth/dto/login-user-.dto';
 import { PrismaService } from 'src/prisma.service';
@@ -94,6 +95,34 @@ export class UserRepository {
     return this.prisma.user.update({
       where: { id },
       data: { ...user },
+    });
+  }
+
+  async updateRefreshToken(
+    email: string,
+    newRefreshToken: LoginUserDto['refreshToken'],
+  ) {
+    return this.prisma.user.update({
+      where: { email },
+      data: {
+        account: {
+          upsert: {
+            create: {
+              refreshToken: newRefreshToken,
+            },
+            update: {
+              refreshToken: newRefreshToken,
+            },
+          },
+        },
+      },
+      include: { account: true },
+    });
+  }
+
+  async checkPhone(phoneNumber: string) {
+    return this.prisma.user.findUnique({
+      where: { phone: phoneNumber },
     });
   }
 

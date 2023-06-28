@@ -27,20 +27,28 @@ export class JwtRefreshStrategy extends PassportStrategy(
         },
       ]),
       secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET_KEY'),
+      // ignoreExpiration: false,
       passReqToCallback: true,
     });
   }
   async validate(payload, req) {
     const refreshToken = payload?.cookies?.refresh;
-    // console.log('payload', payload.cookies.refresh);
-    // console.log('req', req);
-
-    const user = this.authService.getUserIfRefreshTokenMatches(
+    if (!refreshToken) {
+      throw new ForbiddenException('리프레시 토큰 만료');
+    }
+    const {
+      refreshUser,
+      refreshToken: newRefreshToken,
+      ...refreshOption
+    } = await this.authService.getUserIfRefreshTokenMatches(
+      req.email,
       refreshToken,
-      req.userId,
     );
-    if (!user) {
-      return new ForbiddenException('Refresh token invalid');
-    } else return (req.user = user);
+
+    return {
+      refreshUser,
+      refreshToken: newRefreshToken,
+      ...refreshOption,
+    };
   }
 }

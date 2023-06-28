@@ -14,8 +14,8 @@ model User {
   phone          String          @unique
   password       String
   createdAt      DateTime        @default(now())
-  updatedAt      DateTime? 
-  deletedAt      DateTime?       
+  updatedAt      DateTime?
+  deletedAt      DateTime?
   account        Account?
   order          Order[]
   productReviews ProductReview[]
@@ -24,8 +24,8 @@ model User {
 }
 
 model Account {
-  id           Int      @id @default(autoincrement())
-  refreshToken String?
+
+  refreshToken String
   loginAt      DateTime @default(now())
   userId       Int      @unique
   user         User     @relation(fields: [userId], references: [id])
