@@ -24,7 +24,6 @@ model User {
 }
 
 model Account {
-
   refreshToken String
   loginAt      DateTime @default(now())
   userId       Int      @unique
@@ -52,18 +51,18 @@ model Product {
   descImg     String[]
   deliver     Boolean
   categories  String[]
-  order       Order[]
   reviews     ProductReview[]
+  order       Order           @relation(fields: [orderId], references: [id])
+  orderId     Int @unique
 }
 
 model Order {
-  orderId   Int      @id @default(autoincrement())
-  orderDate DateTime @default(now())
+  id   Int       @id @default(autoincrement())
+  orderDate DateTime  @default(now())
   quantity  Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
   userId    Int
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
+  product   Product[]
 }
 
 model Reservation {
@@ -81,11 +80,10 @@ model ProductReview {
   updatedAt DateTime @updatedAt
   secret    Boolean  @default(false)
   comment   String
-  rating    Float
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
-  product   Product? @relation(fields: [productId], references: [id])
-  productId Int?
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
 }
 
 model ClassReview {
