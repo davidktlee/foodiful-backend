@@ -1,3 +1,4 @@
+import { S3, S3Client } from '@aws-sdk/client-s3';
 import {
   Body,
   Controller,
@@ -14,46 +15,61 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
+import s3Storage from 'multer-s3';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { AwsService } from 'src/aws/aws.service';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
 
 @Controller('product')
+@ApiTags('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {
-    this.productService = productService;
-  }
+  constructor(private readonly productService: ProductService) {}
   // 전체 상품 얻기
-  @Get()
-  @UseGuards(AuthGuard())
-  getProducts(): Promise<{ products: Product[] }> {
-    return this.productService.getProducts();
+  @Get('/all')
+  // @UseGuards(AuthGuard())
+  async getProducts(): Promise<{ success: boolean; data: Product[] }> {
+    const data = await this.productService.getProducts();
+    if (data) return { success: true, data };
   }
-  // 이름으로 상품 얻기
-  @Get()
-  searchProduct(@Query('name') name: string) {
-    return this.productService.getProductByName(name);
-  }
+
   // id로 상품 얻기
-  @Get(':id')
-  getProductById(@Param('id') productId: Product['id']) {
-    return this.productService.getProductById(productId);
+  @Get('/:id')
+  async getProductById(
+    @Param('id', ParseIntPipe) productId: Product['id'],
+  ): Promise<{ success: boolean; data: Product }> {
+    const data = await this.productService.getProductById(productId);
+    if (data) return { success: true, data };
   }
 
+  // 이름으로 상품 얻기
+  @Get('/:name')
+  async searchProduct(
+    @Param('name') name: string,
+  ): Promise<{ success: boolean; data: Product }> {
+    const data = await this.productService.getProductByName(name);
+    return { success: true, data };
+  }
+
+  // 상품 추가
+  @UseGuards(RolesGuard)
+  @Roles('PUBLIC')
   @Post()
-  @UseInterceptors(FilesInterceptor('descImg', 10))
-  addProduct(
+  async addProduct(
     @Body() productData: CreateProductDto,
-    @UploadedFiles() files,
-  ): Promise<Product> {
-    return this.productService.addProduct(productData, files);
+  ) /* Promise<Product>*/ {
+    const data = await this.productService.addProduct(productData);
+    return { success: true, data };
   }
 
-  @Delete(':id')
-  deleteProduct(@Param('id') productId: number) {
-    return this.productService.deleteProduct(productId);
-  }
+  // @Delete(':id')
+  // deleteProduct(@Param('id') productId: number) {
+  //   return this.productService.deleteProduct(productId);
+  // }
 
   // @Patch(':id')
   // updateProduct(@Param('id') productId: number, @Body() updatedProduct) {

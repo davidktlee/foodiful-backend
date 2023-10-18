@@ -6,11 +6,11 @@ export class CreateProductDto {
   readonly name: string;
 
   @IsNumber()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => parseInt(value, 10))
   readonly price: number;
 
   @IsNumber()
-  @Transform(({ value }) => parseInt(value))
+  @Transform(({ value }) => parseInt(value, 10))
   readonly discount: number;
 
   @IsString()
@@ -23,6 +23,5 @@ export class CreateProductDto {
   readonly categories: string[];
 
   @IsBoolean()
-  @Transform(({ value }) => value === 'true')
   readonly deliver: boolean;
 }

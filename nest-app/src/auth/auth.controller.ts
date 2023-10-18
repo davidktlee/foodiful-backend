@@ -2,19 +2,23 @@ import {
   Body,
   Controller,
   Get,
-  Param,
   Post,
   Query,
-  Redirect,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 
 import {
+  ApiBadRequestResponse,
+  ApiBasicAuth,
+  ApiBearerAuth,
+  ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -24,13 +28,23 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetUser } from './get-user.decorator';
+import { LoginUserDto } from './dto/login-user-.dto';
+import { Roles } from './roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
+
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @ApiOkResponse({ type: UserEntity, description: '로그인이 완료되었습니다.' })
+  @ApiBadRequestResponse({})
   @Post('/login')
-  async login(@Body() userData, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() userData: LoginUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const {
       accessToken,
       cookieWithRefreshToken: { refreshToken, ...refreshOption },
@@ -44,12 +58,16 @@ export class AuthController {
         name: user.name,
         phone: user.phone,
         token: accessToken,
+        role: user.role,
       },
     };
   }
 
   @Post('/signup')
-  @ApiCreatedResponse({ type: UserEntity })
+  @ApiCreatedResponse({
+    type: UserEntity,
+    description: '회원 가입이 완료되었습니다',
+  })
   @ApiConflictResponse({})
   // @Redirect('/')
   async signUp(
@@ -58,26 +76,33 @@ export class AuthController {
     const { email, name, phone } = await this.authService.signUp(userData);
     return { email, name, phone };
   }
+
   @Get('/authenticate')
-  @ApiCreatedResponse({ description: 'Token 인증이 완료되었습니다.' })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: 'Token 인증이 완료되었습니다.',
+    type: UserEntity,
+  })
   @UseGuards(JwtGuard)
-  isAuthenticated(@Req() req: Request) {
+  isAuthenticated(@GetUser() user) {
     return {
       success: true,
-      user: req.user,
+      user,
     };
   }
 
   @Post('/refresh')
+  @ApiOkResponse({ description: 'refresh token 검증이 완료되었습니다.' })
   @UseGuards(JwtRefreshGuard)
-  async updateRefreshToken(@Res() res: Response, @Req() req: any) {
-    const { refreshUser, refreshToken, refreshOption } = req.user;
+  async updateRefreshToken(@Res() res: Response, @GetUser() user) {
+    const { refreshUser, refreshToken, refreshOption } = user;
     res.cookie('refresh', refreshToken, refreshOption);
     return res
       .json({ message: '통신 완료', success: true, refreshUser })
       .status(200);
   }
 
+  @ApiOkResponse({ description: '로그아웃이 완료되었습니다.' })
   @Post('/logout')
   async logout(@Res({ passthrough: true }) res: Response) {
     const { refreshOption } = this.authService.removeCookieWithRefreshToken();
@@ -85,19 +110,23 @@ export class AuthController {
     return { success: true };
   }
 
+  @ApiOkResponse({ description: '번호 조회가 완료되었습니다.' })
   @Get('/checkphone/exists')
   async isExistPhoneNumber(@Query() data) {
     await this.authService.isPhoneNumberExist(data.phone);
   }
 
+  @ApiOkResponse({ description: '문자 전송이 완료되었습니다.' })
+  @ApiInternalServerErrorResponse({ description: '에러가 발생했습니다.' })
   @Post('/checkphone')
   async checkPhone(@Body() data) {
     await this.authService.sendSMS(data.phoneNumber);
   }
 
+  @ApiOkResponse({ description: '번호 확인이 완료되었습니다.' })
   @Post('/checkphone/verify')
-  async verifyPhone(@Body() data): Promise<boolean> {
+  async verifyPhone(@Body() data): Promise<{ success: boolean }> {
     const res = await this.authService.checkSMS(data.data);
-    if (res) return true;
+    if (res) return { success: true };
   }
 }

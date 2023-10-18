@@ -40,7 +40,7 @@ export class UserRepository {
     });
   }
 
-  async loginUser(userData: LoginUserDto) /*Promise<User>*/ {
+  async loginUser(userData) /*Promise<User>*/ {
     const { email, refreshToken } = userData;
     return await this.prisma.user.update({
       where: { email },
@@ -84,10 +84,9 @@ export class UserRepository {
   }
 
   async softDeleteUser(id: number): Promise<User> {
-    const deletedAt = Date.now().toString();
     return this.prisma.user.update({
       where: { id },
-      data: { deletedAt },
+      data: { deleted: true },
     });
   }
 
@@ -98,10 +97,7 @@ export class UserRepository {
     });
   }
 
-  async updateRefreshToken(
-    email: string,
-    newRefreshToken: LoginUserDto['refreshToken'],
-  ) {
+  async updateRefreshToken(email: string, newRefreshToken: string) {
     return this.prisma.user.update({
       where: { email },
       data: {
@@ -123,6 +119,13 @@ export class UserRepository {
   async checkPhone(phoneNumber: string) {
     return this.prisma.user.findUnique({
       where: { phone: phoneNumber },
+    });
+  }
+
+  async getReservationByUserId(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: { reservations: true },
     });
   }
 

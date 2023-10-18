@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import CryptoJS from 'crypto-js';
 import { Cache } from 'cache-manager';
+import { LoginUserDto } from './dto/login-user-.dto';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)
@@ -121,7 +122,7 @@ export class AuthService {
     }
   }
 
-  async loginUser(userData) {
+  async loginUser(userData: LoginUserDto) {
     try {
       const user = await this.userRepository.getUserByUserEmail(userData.email);
       const checkPassword = await this.compare(
@@ -131,7 +132,11 @@ export class AuthService {
       if (!checkPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
       }
-      const accessToken = await this.getAccessToken(userData.email, user.name);
+      const accessToken = await this.getAccessToken(
+        userData.email,
+        user.name,
+        user.role,
+      );
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
       );
@@ -145,9 +150,9 @@ export class AuthService {
     }
   }
 
-  getAccessToken(email, name) {
+  getAccessToken(email: string, name: string, role: string) {
     const accessToken = this.jwtService.sign(
-      { email, name },
+      { email, name, role },
       {
         expiresIn: '1h',
       },
@@ -202,13 +207,24 @@ export class AuthService {
     if (refreshToken === user.account.refreshToken) {
       const { refreshToken: newRefreshToken, ...refreshOption } =
         this.getCookieWithRefreshToken(user.email);
-      const newAccessToken = this.getAccessToken(user.email, user.name);
+      const newAccessToken = this.getAccessToken(
+        user.email,
+        user.name,
+        user.role,
+      );
       await this.userRepository.updateRefreshToken(user.email, newRefreshToken);
 
       return {
         refreshToken: newRefreshToken,
         refreshOption,
-        refreshUser: { accessToken: newAccessToken, name: user.name },
+        refreshUser: {
+          accessToken: newAccessToken,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          token: newAccessToken,
+          role: user.role,
+        },
       };
     } else {
       throw new NotFoundException('인증 에러');
