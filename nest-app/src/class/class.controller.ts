@@ -22,9 +22,8 @@ export class ClassController {
   }
 
   @Get()
-  async getAllClasses() {
-    const data = await this.classService.getAllClasses();
-    if (data) return { success: true, data };
+  getAllClasses() {
+    return this.classService.getAllClasses();
   }
 
   @Get(':id')

@@ -77,6 +77,7 @@ export class AuthService {
         'x-ncp-apigw-signature-v2': this.makeSignature(),
       },
     };
+    // 실제 메시지 보내는 로직
     // try {
     //   const res = await axios.post(
     //     this.configService.get('NCP_URI'),
@@ -218,7 +219,6 @@ export class AuthService {
         refreshToken: newRefreshToken,
         refreshOption,
         refreshUser: {
-          accessToken: newAccessToken,
           email: user.email,
           name: user.name,
           phone: user.phone,

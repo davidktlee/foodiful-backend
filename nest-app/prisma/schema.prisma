@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  STRANGER
-  PUBLIC
-  ADMIN
-}
-
 model User {
   name           String
   phone          String          @unique
@@ -20,23 +14,23 @@ model User {
   createdAt      DateTime        @default(now())
   email          String          @unique
   id             Int             @id @default(autoincrement())
-  updatedAt      DateTime? // 최근 수정일
-  deleted        Boolean         @default(false) // 탈퇴 여부
-  role           UserRole        @default(PUBLIC) // 유저 롤 (비회원, 회원, 관리자)
+  updatedAt      DateTime?
+  deleted        Boolean         @default(false)
+  role           UserRole        @default(PUBLIC)
   account        Account?
   board          Board?
   classReviews   ClassReview[]
+  message        Message[]
   order          Order[]
   productReviews ProductReview[]
   reservations   Reservation[]
-  message        Message[]
 }
 
 model Account {
-  refreshToken String // 리프레시 토큰
-  loginAt      DateTime @default(now()) // 최근 로그인 일시
-  address      String[] // 배송지 목록, 추가 할 때마다 unshift 후 최근 배송지는 adress[0]으로 가져오기
+  refreshToken String
+  loginAt      DateTime @default(now())
   userId       Int      @unique
+  address      String[]
   user         User     @relation(fields: [userId], references: [id])
 }
 
@@ -45,7 +39,7 @@ model Class {
   price         Int
   discount      Int           @default(0)
   description   String
-  classDuration Int // 수업 시간
+  classDuration Int
   descImg       String[]
   id            Int           @id @default(autoincrement())
   reviews       ClassReview[]
@@ -58,36 +52,35 @@ model Product {
   discount    Int
   description String
   descImg     String[]
-  deliver     Boolean // 배송 여부
+  deliver     Boolean
   categories  String[]
   id          Int            @id @default(autoincrement())
-  reviews     ProductReview?
   Order       Order?
+  reviews     ProductReview?
 }
 
 model Order {
-  id             Int      @id @default(autoincrement())
-  orderDate      DateTime @default(now()) // 주문 일자
-  quantity       Int // 주문 수량
-  deliverName    String // 받는사람 성함
-  deliverAddress String // 받는사람 주소
-  requirement    String // 요청사항
-  totalPrice     Int // 총 가격
+  orderDate      DateTime @default(now())
+  quantity       Int
   userId         Int
-  user           User     @relation(fields: [userId], references: [id])
+  id             Int      @id @default(autoincrement())
   productId      Int      @unique
+  deliverAddress String
+  deliverName    String
+  requirement    String
+  totalPrice     Int
   product        Product  @relation(fields: [productId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
 }
 
 model Reservation {
-  id          Int      @id @default(autoincrement())
-  reserveDate String[]
-  regular     Boolean  @default(false)
-  deleted Boolean @default(false)
   userId      Int
   classId     Int
-  class       Class    @relation(fields: [classId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
+  id          Int     @id @default(autoincrement())
+  reserveDate String[]
+  deleted     Boolean @default(false)
+  class       Class   @relation(fields: [classId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
 }
 
 model ProductReview {
@@ -95,10 +88,10 @@ model ProductReview {
   updatedAt DateTime @updatedAt
   secret    Boolean  @default(false)
   comment   String
-  deleted   Boolean  @default(false)
   userId    Int
   productId Int      @unique
   id        Int      @id @default(autoincrement())
+  deleted   Boolean  @default(false)
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 }
@@ -109,15 +102,14 @@ model ClassReview {
   secret    Boolean  @default(false)
   comment   String
   rating    Float
-  deleted   Boolean  @default(false)
   userId    Int
   classId   Int
   id        Int      @id @default(autoincrement())
+  deleted   Boolean  @default(false)
   class     Class    @relation(fields: [classId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 }
 
-// 공지사항
 model Board {
   id          Int      @id @default(autoincrement())
   title       String
@@ -127,8 +119,6 @@ model Board {
   authorId    Int      @unique
   author      User     @relation(fields: [authorId], references: [id])
 }
-
-// 1대1 대화 model
 
 model Conversation {
   id        Int       @id @default(autoincrement())
@@ -141,8 +131,14 @@ model Message {
   id             Int          @id @default(autoincrement())
   createdAt      DateTime     @default(now())
   text           String
-  senderId       Int // 관리자와의 1대1 대화만 있기 때문에 sender만
-  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       Int
   conversationId Int
   conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation(fields: [senderId], references: [id])
+}
+
+enum UserRole {
+  PUBLIC
+  ADMIN
+  STRANGER
 }

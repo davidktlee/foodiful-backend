@@ -1,6 +1,5 @@
 export class CreateReservationDto {
-  reservedDate: string;
+  reserveDate: string;
   classId: number;
-  userId: number;
-  regular: boolean;
+  userEmail: string;
 }

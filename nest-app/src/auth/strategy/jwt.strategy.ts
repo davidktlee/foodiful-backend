@@ -32,6 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     return {
       email: req.email,
       name: req.name,
+      phone: req.phone,
       token: payload.headers.authorization.replace('Bearer ', ''),
     };
   }

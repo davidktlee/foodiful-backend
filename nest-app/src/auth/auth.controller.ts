@@ -52,7 +52,6 @@ export class AuthController {
     } = await this.authService.loginUser(userData);
     res.cookie('refresh', refreshToken, refreshOption);
     return {
-      success: true,
       user: {
         email: user.email,
         name: user.name,
@@ -86,7 +85,6 @@ export class AuthController {
   @UseGuards(JwtGuard)
   isAuthenticated(@GetUser() user) {
     return {
-      success: true,
       user,
     };
   }

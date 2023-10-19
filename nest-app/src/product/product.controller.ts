@@ -32,38 +32,30 @@ export class ProductController {
   // 전체 상품 얻기
   @Get('/all')
   // @UseGuards(AuthGuard())
-  async getProducts(): Promise<{ success: boolean; data: Product[] }> {
-    const data = await this.productService.getProducts();
-    if (data) return { success: true, data };
+  getProducts(): Promise<Product[]> {
+    return this.productService.getProducts();
   }
 
   // id로 상품 얻기
   @Get('/:id')
-  async getProductById(
+  getProductById(
     @Param('id', ParseIntPipe) productId: Product['id'],
-  ): Promise<{ success: boolean; data: Product }> {
-    const data = await this.productService.getProductById(productId);
-    if (data) return { success: true, data };
+  ): Promise<Product> {
+    return this.productService.getProductById(productId);
   }
 
   // 이름으로 상품 얻기
   @Get('/:name')
-  async searchProduct(
-    @Param('name') name: string,
-  ): Promise<{ success: boolean; data: Product }> {
-    const data = await this.productService.getProductByName(name);
-    return { success: true, data };
+  searchProduct(@Param('name') name: string): Promise<Product> {
+    return this.productService.getProductByName(name);
   }
 
   // 상품 추가
   @UseGuards(RolesGuard)
   @Roles('PUBLIC')
   @Post()
-  async addProduct(
-    @Body() productData: CreateProductDto,
-  ) /* Promise<Product>*/ {
-    const data = await this.productService.addProduct(productData);
-    return { success: true, data };
+  addProduct(@Body() productData: CreateProductDto): Promise<Product> {
+    return this.productService.addProduct(productData);
   }
 
   // @Delete(':id')
