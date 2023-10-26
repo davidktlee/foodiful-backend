@@ -29,11 +29,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   // 있다면 유저 객체를 반환
   // return 값은 @useGuard(jwt)를 이용한 모든 요청의 req 객체에 들어감
   async validate(payload, req) {
+    console.log(payload);
     return {
       email: req.email,
       name: req.name,
       phone: req.phone,
       token: payload.headers.authorization.replace('Bearer ', ''),
+      role: req.role,
     };
   }
 }

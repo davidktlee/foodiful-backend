@@ -5,6 +5,9 @@ export class CreateProductDto {
   @IsString()
   readonly name: string;
 
+  @IsString()
+  readonly subTitle: string;
+
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10))
   readonly price: number;
@@ -12,6 +15,10 @@ export class CreateProductDto {
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10))
   readonly discount: number;
+
+  @IsNumber()
+  @Transform(({ value }) => parseInt(value, 10))
+  readonly quantity: number;
 
   @IsString()
   readonly description: string;

@@ -137,6 +137,7 @@ export class AuthService {
         userData.email,
         user.name,
         user.role,
+        user.phone,
       );
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
@@ -151,9 +152,9 @@ export class AuthService {
     }
   }
 
-  getAccessToken(email: string, name: string, role: string) {
+  getAccessToken(email: string, name: string, role: string, phone: string) {
     const accessToken = this.jwtService.sign(
-      { email, name, role },
+      { email, name, role, phone },
       {
         expiresIn: '1h',
       },
@@ -212,6 +213,7 @@ export class AuthService {
         user.email,
         user.name,
         user.role,
+        user.phone,
       );
       await this.userRepository.updateRefreshToken(user.email, newRefreshToken);
 

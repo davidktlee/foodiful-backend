@@ -4,11 +4,7 @@ import {
   InternalServerErrorException,
   Post,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { CheckFileInterceptor } from './aws.decorator';
-import { FileTypeMiddleware } from './aws.middleware';
 import { AwsService } from './aws.service';
-import { UploadFilesDto, VALID_IMAGE_FILE_TYPES } from './dto/uploadFile-dto';
 
 @Controller('aws')
 export class AwsController {

@@ -52,7 +52,7 @@ export class ProductController {
 
   // 상품 추가
   @UseGuards(RolesGuard)
-  @Roles('PUBLIC')
+  @Roles('ADMIN')
   @Post()
   addProduct(@Body() productData: CreateProductDto): Promise<Product> {
     return this.productService.addProduct(productData);
