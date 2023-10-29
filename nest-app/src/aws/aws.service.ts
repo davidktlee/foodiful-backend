@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { randomUUID } from 'crypto';
@@ -28,19 +32,23 @@ export class AwsService {
     // );
 
     // 두 번째 방법
-    return Promise.all(
-      fileTypes.map(async (fileType) => {
-        const extension = fileType.split('/')[1];
-        const imageKey = `${randomUUID()}.${extension}`;
-        const key = `${bucket}/${imageKey}`;
-        const signenUrlPut = await this.s3.getSignedUrlPromise('putObject', {
-          Bucket: this.bucketName,
-          Key: key,
-          Expires: 60 * 60,
-        });
-        return signenUrlPut;
-      }),
-    );
+    try {
+      return Promise.all(
+        fileTypes.map(async (fileType) => {
+          const extension = fileType.split('/')[1];
+          const imageKey = `${randomUUID()}.${extension}`;
+          const key = `${bucket}/${imageKey}`;
+          const signenUrlPut = await this.s3.getSignedUrlPromise('putObject', {
+            Bucket: this.bucketName,
+            Key: key,
+            Expires: 60 * 60,
+          });
+          return signenUrlPut;
+        }),
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('서버에 문제가 있습니다.');
+    }
 
     /**
      *  'getObject': 객체를 가져오는 작업을 나타냅니다. 이 작업은 S3 버킷의 객체를 읽어오는 데 사용됩니다.

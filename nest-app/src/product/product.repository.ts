@@ -31,6 +31,15 @@ export class ProductRepository {
       where: { id },
     });
   }
+
+  async updateProductImage(id: number, removedImg: string[]) {
+    return this.prisma.product.update({
+      where: { id },
+      data: {
+        descImg: removedImg,
+      },
+    });
+  }
   async updateProduct(id: number, product: UpdateProductDto): Promise<Product> {
     return this.prisma.product.update({
       where: { id },

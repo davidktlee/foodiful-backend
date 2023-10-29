@@ -63,24 +63,29 @@ export class ProductService {
   //   return locations;
   // }
 
-  // async deleteProductImg(
-  //   key: string,
-  // ): Promise<{ key: string; message: string }> {
-  //   const s3 = new S3({
-  //     region: this.config.get('AWS_BUCKET_REGION'),
-  //     credentials: {
-  //       accessKeyId: this.config.get('AWS_ACCESS_KEY_ID'),
-  //       secretAccessKey: this.config.get('AWS_SECRET_ACCESS_KEY'),
-  //     },
-  //   });
-  //   const startKey = key.indexOf('product');
-  //   await s3.deleteObject({
-  //     Bucket: this.config.get('AWS_BUCKET_NAME'),
-  //     Key: key.slice(startKey, key.length),
-  //   });
-  //   console.log(key);
-  //   return { key, message: '삭제가 완료되었습니다' };
-  // }
+  async deleteProductImg(
+    id: number,
+    key: string,
+  ): Promise<{ key: string; message: string }> {
+    const s3 = new S3({
+      region: this.config.get('AWS_BUCKET_REGION'),
+      credentials: {
+        accessKeyId: this.config.get('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.config.get('AWS_SECRET_ACCESS_KEY'),
+      },
+    });
+    const startKey = key.indexOf('product');
+    await s3.deleteObject({
+      Bucket: this.config.get('AWS_BUCKET_NAME'),
+      Key: key.slice(startKey, key.length),
+    });
+    const { descImg } = await this.productRepository.getProductById(id);
+
+    const removedImg = descImg.filter((img) => !img.includes(key));
+
+    await this.productRepository.updateProductImage(id, removedImg);
+    return { key, message: '삭제가 완료되었습니다' };
+  }
 
   async addProduct(productData: CreateProductDto) {
     try {
@@ -101,34 +106,15 @@ export class ProductService {
   //   return res;
   // }
 
-  // async updateProduct(id: number, updateProductData, files): Promise<Product> {
-  //   try {
-  //     const product = await this.getProductById(id);
-  //     if (!product) {
-  //       throw new NotFoundException('수정하실 상품이 존재하지 않습니다');
-  //     } else {
-  //       for (const key in product) {
-  //         if (
-  //           product.hasOwnProperty(key) &&
-  //           updateProductData.hasOwnProperty(key)
-  //         ) {
-  //           if (product[key] !== updateProductData[key]) {
-  //             product[key] = updateProductData[key];
-  //           }
-  //         }
-  //       }
-  //       if (files) {
-  //         product.descImg.map((file) => this.deleteProductImg(file));
-  //         files = await this.uploadProductImg(files);
-  //       }
-  //       const updatedProduct = await this.productRepository.updateProduct(id, {
-  //         ...product,
-  //         descImg: files,
-  //       });
-  //       return updatedProduct;
-  //     }
-  //   } catch (error) {
-  //     throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
-  //   }
-  // }
+  async updateProduct(id: number, updateProductData) {
+    try {
+      const product = await this.getProductById(id);
+      if (!product) {
+        throw new NotFoundException('수정하실 상품이 존재하지 않습니다');
+      }
+      return this.productRepository.updateProduct(id, updateProductData);
+    } catch (error) {
+      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+    }
+  }
 }

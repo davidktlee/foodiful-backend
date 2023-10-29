@@ -22,6 +22,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { AwsService } from 'src/aws/aws.service';
 
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
 
@@ -63,8 +64,17 @@ export class ProductController {
   //   return this.productService.deleteProduct(productId);
   // }
 
-  // @Patch(':id')
-  // updateProduct(@Param('id') productId: number, @Body() updatedProduct) {
-  //   return this.productService.updateProduct(productId, updatedProduct);
-  // }
+  @Delete('/image/:id')
+  deleteProductImg(@Param('id', ParseIntPipe) id: Product['id'], @Body() data) {
+    return this.productService.deleteProductImg(id, data.img);
+  }
+
+  @Patch(':id')
+  updateProduct(
+    @Param('id', ParseIntPipe) productId: Product['id'],
+    @Body() updatedProduct: UpdateProductDto,
+  ) {
+    console.log(updatedProduct);
+    return this.productService.updateProduct(productId, updatedProduct);
+  }
 }

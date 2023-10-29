@@ -32,6 +32,7 @@ import { GetUser } from './get-user.decorator';
 import { LoginUserDto } from './dto/login-user-.dto';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -83,10 +84,8 @@ export class AuthController {
     type: UserEntity,
   })
   @UseGuards(JwtGuard)
-  isAuthenticated(@GetUser() user) {
-    return {
-      user,
-    };
+  isAuthenticated(@GetUser() user: User): User {
+    return user;
   }
 
   @Post('/refresh')
@@ -105,7 +104,7 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     const { refreshOption } = this.authService.removeCookieWithRefreshToken();
     res.cookie('refresh', '', refreshOption);
-    return { success: true };
+    return;
   }
 
   @ApiOkResponse({ description: '번호 조회가 완료되었습니다.' })

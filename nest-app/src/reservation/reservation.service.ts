@@ -28,7 +28,6 @@ export class ReservationService {
   }
 
   async createReservation(reservation: CreateReservationDto) {
-    console.log(reservation);
     const { id } = await this.userRepository.getUserByUserEmail(
       reservation.userEmail,
     );
