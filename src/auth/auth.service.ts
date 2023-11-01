@@ -17,7 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import CryptoJS from 'crypto-js';
 import { Cache } from 'cache-manager';
-import { LoginUserDto } from './dto/login-user-.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)

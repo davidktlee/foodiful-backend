@@ -29,7 +29,7 @@ import { JwtGuard } from './guards/jwt.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUser } from './get-user.decorator';
-import { LoginUserDto } from './dto/login-user-.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { User } from '@prisma/client';

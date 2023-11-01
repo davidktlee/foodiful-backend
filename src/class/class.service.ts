@@ -7,7 +7,7 @@ import { UpdateClassDto } from './dto/update-class.dto';
 export class ClassService {
   constructor(private classRepository: ClassRepository) {}
   create(createClassDto: CreateClassDto) {
-    return 'This action adds a new class';
+    return this.classRepository.createClass(createClassDto);
   }
 
   getAllClasses() {
