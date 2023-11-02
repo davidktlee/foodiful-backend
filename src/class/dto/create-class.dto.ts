@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNumber,
-  IsObject,
-  IsString,
-  MinLength,
-} from 'class-validator';
-import { isStringObject } from 'util/types';
+import { IsArray, IsNumber, IsString } from 'class-validator';
 
 export class CreateClassDto {
   @ApiProperty({ required: true, example: '정규 클래스' })

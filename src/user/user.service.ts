@@ -66,25 +66,6 @@ export class UserService {
     }
   }
 
-  // async createUser(userData): Promise<{ createdUser: User; message: string }> {
-  //   try {
-  //     // // const hashedUserData = await this.transformPassword(userData.password);
-  //     // const createdUser = await this.userRepository.createUser({
-  //     //   ...userData,
-  //     //   password: hashedUserData,
-  //     // });
-  //     return { createdUser, message: '회원이 추가되었습니다.' };
-  //   } catch (error) {
-  //     if (error.code === 'P2002') {
-  //       throw new ConflictException(
-  //         '이미 존재하는 userId 이거나 이미 존재하는 휴대폰 번호입니다.',
-  //       );
-  //     } else {
-  //       throw new InternalServerErrorException(error.message);
-  //     }
-  //   }
-  // }
-
   // async uploadUserProfile(file: Express.MulterS3.File) {
   //   if (!file) {
   //     throw new BadRequestException('파일을 업로드해주세요.');
@@ -135,5 +116,9 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async getPurchasedList() {
+    return;
   }
 }

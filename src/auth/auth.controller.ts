@@ -59,6 +59,7 @@ export class AuthController {
         phone: user.phone,
         token: accessToken,
         role: user.role,
+        id: user.id,
       },
     };
   }
@@ -73,6 +74,7 @@ export class AuthController {
   async signUp(
     @Body() userData: CreateUserDto,
   ): Promise<Pick<UserEntity, 'email' | 'phone' | 'name'>> {
+    console.log('userData', userData);
     const { email, name, phone } = await this.authService.signUp(userData);
     return { email, name, phone };
   }

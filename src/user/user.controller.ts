@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UploadedFile,
@@ -37,7 +38,7 @@ export class UserController {
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
-  async getUserById(@Param('id') id: number): Promise<User> {
+  getUserById(@Param('id', ParseIntPipe) id: User['id']): Promise<User> {
     return this.userService.getUserById(id);
   }
 
@@ -45,8 +46,8 @@ export class UserController {
   @ApiOkResponse({
     type: UserEntity,
   })
-  async deleteUser(
-    @Param('id') id: number,
+  deleteUser(
+    @Param('id', ParseIntPipe) id: User['id'],
   ): Promise<{ user: User; message: string }> {
     return this.userService.deleteUser(id);
   }
@@ -54,7 +55,7 @@ export class UserController {
   @Patch(':id')
   @ApiOkResponse({ type: UserEntity })
   @UseInterceptors(FileInterceptor('profile'))
-  async patchUser(
+  patchUser(
     @Param('id') id: number,
     @Body() updateUserData: UpdateUserDto,
   ): Promise<{ updatedUser: User; message: string }> {

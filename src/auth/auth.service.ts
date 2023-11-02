@@ -119,6 +119,7 @@ export class AuthService {
       });
       return { email, name, phone };
     } catch (error) {
+      console.log('error', error);
       throw new ConflictException('이미 존재하는 유저입니다');
     }
   }
