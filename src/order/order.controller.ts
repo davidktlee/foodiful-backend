@@ -27,11 +27,6 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get('/:email')
-  getOrderByUserId(@Param('id', ParseIntPipe) userId: User['id']) {
-    return this.orderService.getOrderByUserEmail(userId);
-  }
-
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,

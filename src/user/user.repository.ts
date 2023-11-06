@@ -128,19 +128,4 @@ export class UserRepository {
       include: { reservations: true },
     });
   }
-
-  // async updateRefreshToken(id, refreshToken) {
-  //   return this.prisma.user.update({
-  //     where: { userId: id },
-  //     data: {
-  //       accounts: {
-  //         accessToken: '',
-  //         refreshToken,
-  //       },
-  //     },
-  //     includes: {
-  //       accounts: true,
-  //     },
-  //   });
-  // }
 }

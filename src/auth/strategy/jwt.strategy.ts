@@ -35,6 +35,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       phone: req.phone,
       token: payload.headers.authorization.replace('Bearer ', ''),
       role: req.role,
+      id: req.id,
     };
   }
 }

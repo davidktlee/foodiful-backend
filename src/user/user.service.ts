@@ -6,17 +6,18 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from '../auth/dto/create-user.dto';
 
 import { User } from '@prisma/client';
 import { UserRepository } from './user.repository';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
+import { OrderRepository } from 'src/order/order.repository';
 
 @Injectable()
 export class UserService {
   constructor(
     private userRepository: UserRepository,
+    private readonly orderRepository: OrderRepository,
     private readonly config: ConfigService,
   ) {}
 
@@ -118,7 +119,13 @@ export class UserService {
     }
   }
 
-  async getPurchasedList() {
-    return;
+  async getOrderByUserId(id: number) {
+    try {
+      const user = await this.userRepository.getUserById(id);
+      if (!user) throw new NotFoundException('유저가 존재하지 않습니다.');
+      return this.orderRepository.getOrderByUserId(id);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 }

@@ -18,7 +18,7 @@ export class OrderService {
     return `This action returns a #${id} order`;
   }
 
-  async getOrderByUserEmail(id: number) {
+  async getOrderByUserId(id: number) {
     const orders = await this.orderRepository.getOrderByUserId(id);
     if (orders.length < 0) throw new NotFoundException('주문 내역이 없습니다');
     return orders;

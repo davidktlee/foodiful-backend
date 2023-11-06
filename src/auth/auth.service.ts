@@ -119,7 +119,6 @@ export class AuthService {
       });
       return { email, name, phone };
     } catch (error) {
-      console.log('error', error);
       throw new ConflictException('이미 존재하는 유저입니다');
     }
   }
@@ -139,6 +138,7 @@ export class AuthService {
         user.name,
         user.role,
         user.phone,
+        user.id,
       );
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
@@ -153,9 +153,15 @@ export class AuthService {
     }
   }
 
-  getAccessToken(email: string, name: string, role: string, phone: string) {
+  getAccessToken(
+    email: string,
+    name: string,
+    role: string,
+    phone: string,
+    id: number,
+  ) {
     const accessToken = this.jwtService.sign(
-      { email, name, role, phone },
+      { email, name, role, phone, id },
       {
         expiresIn: '1h',
       },
@@ -215,6 +221,7 @@ export class AuthService {
         user.name,
         user.role,
         user.phone,
+        user.id,
       );
       await this.userRepository.updateRefreshToken(user.email, newRefreshToken);
 

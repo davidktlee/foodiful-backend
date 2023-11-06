@@ -33,14 +33,14 @@ export class ClassController {
 
   @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateClassDto: UpdateClassDto,
   ) {
-    return this.classService.update(+id, updateClassDto);
+    return this.classService.update(id, updateClassDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.classService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.classService.remove(id);
   }
 }

@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { GetUser } from 'src/auth/get-user.decorator';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -60,5 +61,10 @@ export class UserController {
     @Body() updateUserData: UpdateUserDto,
   ): Promise<{ updatedUser: User; message: string }> {
     return this.userService.updateUser(id, updateUserData);
+  }
+
+  @Get('/order/:id')
+  getOrderByUserId(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getOrderByUserId(id);
   }
 }

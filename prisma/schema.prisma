@@ -69,6 +69,7 @@ model Order {
   userId         Int
   id             Int            @id @default(autoincrement())
   deliverAddress String
+  deliverSpecificAddress String
   deliverName    String
   requirement    String
   totalPrice     Int
@@ -79,14 +80,14 @@ model Order {
 }
 
 model OrderProduct {
-  id         Int     @id @default(autoincrement())
-  orderCount Int
-  orderPrice Int
+  id              Int     @id @default(autoincrement())
+  orderCount      Int
+  orderPrice      Int
   additionalCount Int
-  productId  Int
-  orderId    Int
-  order      Order   @relation(fields: [orderId], references: [id])
-  product    Product @relation(fields: [productId], references: [id])
+  productId       Int
+  orderId         Int
+  order           Order   @relation(fields: [orderId], references: [id])
+  product         Product @relation(fields: [productId], references: [id])
 }
 
 model Reservation {
@@ -166,12 +167,12 @@ model Cart {
 }
 
 model ProductOnCart {
-  cartId    Int
-  productId Int
-  quantity  Int
+  cartId          Int
+  productId       Int
+  quantity        Int
   additionalCount Int
-  cart      Cart    @relation(fields: [cartId], references: [id])
-  product   Product @relation(fields: [productId], references: [id])
+  cart            Cart    @relation(fields: [cartId], references: [id])
+  product         Product @relation(fields: [productId], references: [id])
 
   @@id([cartId, productId])
 }

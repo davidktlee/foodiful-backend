@@ -12,6 +12,8 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './common/transform.interceptors';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { OrderModule } from './order/order.module';
+import { OrderProductModule } from './order-product/order-product.module';
+import { ProductReviewModule } from './product-review/product-review.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { OrderModule } from './order/order.module';
     ClassModule,
     ReservationModule,
     OrderModule,
+    OrderProductModule,
+    ProductReviewModule,
   ],
   controllers: [AppController],
   providers: [
