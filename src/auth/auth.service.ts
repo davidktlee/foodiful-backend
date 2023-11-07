@@ -234,6 +234,7 @@ export class AuthService {
           phone: user.phone,
           token: newAccessToken,
           role: user.role,
+          id: user.id,
         },
       };
     } else {

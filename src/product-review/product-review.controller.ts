@@ -18,18 +18,20 @@ export class ProductReviewController {
 
   @Post()
   create(@Body() createProductReviewDto: CreateProductReviewDto) {
+    console.log(createProductReviewDto);
     return this.productReviewService.create(createProductReviewDto);
   }
 
   @Get(':id')
   getAllProductReviews(@Param('id', ParseIntPipe) id: number) {
+    console.log(id);
     return this.productReviewService.getAllProductReviews(id);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productReviewService.findOne(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id', ParseIntPipe) id: number) {
+  //   return this.productReviewService.findOne(id);
+  // }
 
   @Patch(':id')
   update(

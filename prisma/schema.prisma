@@ -60,7 +60,7 @@ model Product {
   subTitle     String
   orderProduct OrderProduct[]
   carts        ProductOnCart[]
-  reviews      ProductReview?
+  reviews      ProductReview[]
 }
 
 model Order {
@@ -105,11 +105,11 @@ model ProductReview {
   updatedAt DateTime @updatedAt
   comment   String
   userId    Int
-  productId Int      @unique
+  productId Int      
   id        Int      @id @default(autoincrement())
   deleted   Boolean  @default(false)
   isSecret  Boolean  @default(false)
-  rating    Float
+  rating    Int
   reviewImg String[]
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])

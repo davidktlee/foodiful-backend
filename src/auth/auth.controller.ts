@@ -59,6 +59,7 @@ export class AuthController {
         phone: user.phone,
         token: accessToken,
         role: user.role,
+        id: user.id,
       },
     };
   }
@@ -85,7 +86,6 @@ export class AuthController {
   })
   @UseGuards(JwtGuard)
   isAuthenticated(@GetUser() user: User): User {
-    console.log(user);
     return user;
   }
 
@@ -94,6 +94,7 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async updateRefreshToken(@Res() res: Response, @GetUser() user) {
     const { refreshUser, refreshToken, refreshOption } = user;
+    console.log(user);
     res.cookie('refresh', refreshToken, refreshOption);
     return res
       .json({ message: '통신 완료', success: true, refreshUser })

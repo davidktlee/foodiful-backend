@@ -11,7 +11,14 @@ import { ProductReviewRepository } from './product-review.repository';
 export class ProductReviewService {
   constructor(private productReviewRepository: ProductReviewRepository) {}
   create(createProductReviewDto: CreateProductReviewDto) {
-    return 'This action adds a new productReview';
+    try {
+      // const user = this.userService.getUser(userId);
+      // const product = this.productRepository.getProduct(productId)
+      // if(!user || !product) throw new NotFoundError()
+      return this.productReviewRepository.create(createProductReviewDto);
+    } catch (error) {
+      throw new InternalServerErrorException('서버 에러입니다.');
+    }
   }
 
   async getAllProductReviews(id: number) {
