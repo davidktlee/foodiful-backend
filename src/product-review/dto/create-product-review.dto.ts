@@ -20,8 +20,8 @@ export class CreateProductReviewDto {
     required: true,
     example: ['https://aws...', 'https://aws...'],
   })
-  @IsString({ each: true })
-  reviewImg: string[];
+  @IsString()
+  reviewImg: string;
 
   @ApiProperty({ required: true, example: 1 })
   @IsNumber()

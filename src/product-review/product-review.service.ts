@@ -10,22 +10,24 @@ import { ProductReviewRepository } from './product-review.repository';
 @Injectable()
 export class ProductReviewService {
   constructor(private productReviewRepository: ProductReviewRepository) {}
-  create(createProductReviewDto: CreateProductReviewDto) {
+  createProductReview(createProductReviewDto: CreateProductReviewDto) {
     try {
       // const user = this.userService.getUser(userId);
       // const product = this.productRepository.getProduct(productId)
       // if(!user || !product) throw new NotFoundError()
-      return this.productReviewRepository.create(createProductReviewDto);
+      return this.productReviewRepository.createProductReview(
+        createProductReviewDto,
+      );
     } catch (error) {
       throw new InternalServerErrorException('서버 에러입니다.');
     }
   }
 
-  async getAllProductReviews(id: number) {
+  async getAllProductReviewsByProductId(id: number) {
     try {
       const productReviews =
         await this.productReviewRepository.getAllProductReviews(id);
-      if (productReviews.length > 0)
+      if (productReviews.length < 0)
         throw new NotFoundException('리뷰가 없습니다.');
       return productReviews;
     } catch (error) {
@@ -37,8 +39,22 @@ export class ProductReviewService {
     return `This action returns a #${id} productReview`;
   }
 
-  update(id: number, updateProductReviewDto: UpdateProductReviewDto) {
-    return `This action updates a #${id} productReview`;
+  updateProductReview(
+    id: number,
+    updateProductReviewDto: UpdateProductReviewDto,
+  ) {
+    try {
+      const productReview =
+        this.productReviewRepository.getProductReviewById(id);
+      if (!productReview)
+        throw new NotFoundException('찾으시는 상품 리뷰가 없습니다.');
+      this.productReviewRepository.updateProductReview(
+        id,
+        updateProductReviewDto,
+      );
+    } catch (error) {
+      throw new InternalServerErrorException('서버 에러가 있습니다.');
+    }
   }
 
   remove(id: number) {

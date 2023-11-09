@@ -19,7 +19,10 @@ export class ProductRepository {
   }
 
   async getProductById(id: number): Promise<Product> {
-    return this.prisma.product.findUnique({ where: { id } });
+    return this.prisma.product.findUnique({
+      where: { id },
+      include: { reviews: true },
+    });
   }
 
   async addProduct(product: CreateProductDto): Promise<Product> {

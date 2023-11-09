@@ -17,15 +17,15 @@ export class ProductReviewController {
   constructor(private readonly productReviewService: ProductReviewService) {}
 
   @Post()
-  create(@Body() createProductReviewDto: CreateProductReviewDto) {
-    console.log(createProductReviewDto);
-    return this.productReviewService.create(createProductReviewDto);
+  createProductReview(@Body() createProductReviewDto: CreateProductReviewDto) {
+    return this.productReviewService.createProductReview(
+      createProductReviewDto,
+    );
   }
 
   @Get(':id')
-  getAllProductReviews(@Param('id', ParseIntPipe) id: number) {
-    console.log(id);
-    return this.productReviewService.getAllProductReviews(id);
+  getAllProductReviewsByProductId(@Param('id', ParseIntPipe) id: number) {
+    return this.productReviewService.getAllProductReviewsByProductId(id);
   }
 
   // @Get(':id')
@@ -34,11 +34,14 @@ export class ProductReviewController {
   // }
 
   @Patch(':id')
-  update(
+  updateProductReview(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductReviewDto: UpdateProductReviewDto,
   ) {
-    return this.productReviewService.update(id, updateProductReviewDto);
+    return this.productReviewService.updateProductReview(
+      id,
+      updateProductReviewDto,
+    );
   }
 
   @Delete(':id')
