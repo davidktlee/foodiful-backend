@@ -40,9 +40,11 @@ export class UserRepository {
     });
   }
 
-  async loginUser(userData) /*Promise<User>*/ {
+  async loginUser(
+    userData: LoginUserDto & { refreshToken: string },
+  ) /*Promise<User>*/ {
     const { email, refreshToken } = userData;
-    return await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { email },
       data: {
         account: {
@@ -90,27 +92,11 @@ export class UserRepository {
     });
   }
 
-  async updateUser(id: number, user: UpdateUserDto): Promise<User> {
+  async updateUser(id: number, updateUserData: UpdateUserDto): Promise<User> {
     return this.prisma.user.update({
       where: { id },
-      data: { ...user },
-    });
-  }
-
-  async updateRefreshToken(email: string, newRefreshToken: string) {
-    return this.prisma.user.update({
-      where: { email },
       data: {
-        account: {
-          upsert: {
-            create: {
-              refreshToken: newRefreshToken,
-            },
-            update: {
-              refreshToken: newRefreshToken,
-            },
-          },
-        },
+        ...updateUserData,
       },
       include: { account: true },
     });

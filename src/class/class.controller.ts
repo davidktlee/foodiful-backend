@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 import { ClassService } from './class.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
@@ -16,12 +19,14 @@ import { UpdateClassDto } from './dto/update-class.dto';
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @Post()
   create(@Body() createClassDto: CreateClassDto) {
     return this.classService.create(createClassDto);
   }
 
-  @Get()
+  @Get('/all')
   getAllClasses() {
     return this.classService.getAllClasses();
   }

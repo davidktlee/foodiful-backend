@@ -18,12 +18,15 @@ import { ConfigService } from '@nestjs/config';
 import CryptoJS from 'crypto-js';
 import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AccountRepository } from './account.repository';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)
 export class AuthService {
   constructor(
     private userRepository: UserRepository,
+    private accountRepository: AccountRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -94,10 +97,11 @@ export class AuthService {
   }
 
   async checkSMS({ phoneNumber, verifyCode }) {
+    console.log(typeof verifyCode);
     const cacheVerifyNum = await this.cacheManager.get(phoneNumber);
     if (!cacheVerifyNum) {
       throw new UnauthorizedException('인증 번호가 만료되었습니다');
-    } else if (Number(cacheVerifyNum) == verifyCode) {
+    } else if (cacheVerifyNum == verifyCode) {
       return true;
     } else {
       throw new UnauthorizedException('인증 번호가 일치하지 않습니다');
@@ -107,11 +111,14 @@ export class AuthService {
   async isPhoneNumberExist(phoneNumber: string) {
     const user = await this.userRepository.checkPhone(phoneNumber);
     if (user) throw new ConflictException('이미 존재하는 휴대폰 번호입니다.');
-    return true;
+    return { isExist: false };
   }
 
   async signUp(userData: CreateUserDto) {
     try {
+      const isExistPhone = await this.userRepository.checkPhone(userData.phone);
+      if (isExistPhone)
+        throw new ConflictException('이미 존재하는 휴대폰 번호입니다.');
       const hashedPassword = await this.transform(userData.password);
       const { email, name, phone } = await this.userRepository.createUser({
         ...userData,
@@ -126,11 +133,11 @@ export class AuthService {
   async loginUser(userData: LoginUserDto) {
     try {
       const user = await this.userRepository.getUserByUserEmail(userData.email);
-      const checkPassword = await this.compare(
+      const checkedPassword = await this.compare(
         userData.password,
         user.password,
       );
-      if (!checkPassword) {
+      if (!checkedPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
       }
       const accessToken = await this.getAccessToken(
@@ -143,6 +150,10 @@ export class AuthService {
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
       );
+      await this.accountRepository.updateRefreshToken(
+        user.id,
+        cookieWithRefreshToken.refreshToken,
+      );
       await this.userRepository.loginUser({
         ...userData,
         refreshToken: cookieWithRefreshToken.refreshToken,
@@ -151,6 +162,36 @@ export class AuthService {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async updateUser(userId, updateUserData: UpdateUserDto) {
+    const user = await this.userRepository.getUserById(userId);
+    const checkedPassword = await this.compare(
+      updateUserData.password,
+      user.password,
+    );
+    if (!checkedPassword) {
+      throw new UnauthorizedException('비밀번호 불일치');
+    }
+    const accessToken = await this.getAccessToken(
+      user.email,
+      updateUserData.name,
+      user.role,
+      updateUserData.phone,
+      user.id,
+    );
+    const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
+      user.email,
+    );
+    await this.accountRepository.updateRefreshToken(
+      user.id,
+      cookieWithRefreshToken.refreshToken,
+    );
+    await this.userRepository.updateUser(userId, updateUserData);
+    return { accessToken, cookieWithRefreshToken, user };
+
+    // 유저 불러온 후 패스워드 비교
+    // jwt token 및 refresh token  재 생성
   }
 
   getAccessToken(
@@ -223,7 +264,7 @@ export class AuthService {
         user.phone,
         user.id,
       );
-      await this.userRepository.updateRefreshToken(user.email, newRefreshToken);
+      await this.accountRepository.updateRefreshToken(user.id, newRefreshToken);
 
       return {
         refreshToken: newRefreshToken,

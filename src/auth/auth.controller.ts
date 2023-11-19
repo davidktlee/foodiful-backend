@@ -2,6 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -33,6 +36,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 import { User } from '@prisma/client';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -78,6 +82,20 @@ export class AuthController {
     return { email, name, phone };
   }
 
+  @Patch('/update')
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: '업데이트가 완료되었습니다.',
+    type: UserEntity,
+  })
+  @UseGuards(JwtGuard)
+  async updateUser(
+    @Param('id', ParseIntPipe) userId,
+    @Body() updateUserData: UpdateUserDto,
+  ) {
+    return this.authService.updateUser(userId, updateUserData);
+  }
+
   @Get('/authenticate')
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -94,7 +112,6 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   async updateRefreshToken(@Res() res: Response, @GetUser() user) {
     const { refreshUser, refreshToken, refreshOption } = user;
-    console.log(user);
     res.cookie('refresh', refreshToken, refreshOption);
     return res
       .json({ message: '통신 완료', success: true, refreshUser })
@@ -126,6 +143,7 @@ export class AuthController {
   @Post('/checkphone/verify')
   async verifyPhone(@Body() data): Promise<{ success: boolean }> {
     const res = await this.authService.checkSMS(data.data);
+
     if (res) return { success: true };
   }
 }
