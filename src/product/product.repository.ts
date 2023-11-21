@@ -12,6 +12,15 @@ export class ProductRepository {
     return this.prisma.product.findMany();
   }
 
+  async getProductsWithUserId(userId: number) {
+    const products = await this.prisma.product.findMany();
+    const productsWithLiked = await this.prisma.favoriteProduct.findMany({
+      where: { userId },
+      select: { productId: true },
+    });
+    console.log(productsWithLiked);
+  }
+
   async getProductByName(name: string): Promise<Product> {
     return this.prisma.product.findUnique({
       where: { name },

@@ -14,6 +14,8 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
 import { OrderModule } from './order/order.module';
 import { OrderProductModule } from './order-product/order-product.module';
 import { ProductReviewModule } from './product-review/product-review.module';
+import { FavoriteClassModule } from './favorite-class/favorite-class.module';
+import { FavoriteProductModule } from './favorite-product/favorite-product.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ProductReviewModule } from './product-review/product-review.module';
     OrderModule,
     OrderProductModule,
     ProductReviewModule,
+    FavoriteProductModule,
+    FavoriteClassModule,
   ],
   controllers: [AppController],
   providers: [

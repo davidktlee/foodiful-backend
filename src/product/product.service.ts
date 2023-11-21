@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UploadFilesDto } from 'src/aws/dto/uploadFile-dto';
+import { FavoriteProductRepository } from 'src/favorite-product/favorite-product.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entity/product.entity';
@@ -18,6 +19,7 @@ import { ProductRepository } from './product.repository';
 export class ProductService {
   constructor(
     private productRepository: ProductRepository,
+    private favoriteProductRepository: FavoriteProductRepository,
     private readonly config: ConfigService,
   ) {}
 
@@ -31,6 +33,21 @@ export class ProductService {
     } catch (error) {
       throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
     }
+  }
+
+  async getProductsWithUserLiked(userId: number) {
+    const productIdsWithLiked =
+      await this.favoriteProductRepository.getLikedProductIds(userId);
+    const products = await this.productRepository.getProducts();
+
+    const productsWithLiked = products.map((product) => {
+      return {
+        ...product,
+        isLiked: productIdsWithLiked.includes(product.id),
+      };
+    });
+
+    return productsWithLiked;
   }
 
   async getProductByName(name: string): Promise<Product> {
@@ -106,7 +123,7 @@ export class ProductService {
   //   return res;
   // }
 
-  async updateProduct(id: number, updateProductData) {
+  async updateProduct(id: number, updateProductData: UpdateProductDto) {
     try {
       const product = await this.getProductById(id);
       if (!product) {

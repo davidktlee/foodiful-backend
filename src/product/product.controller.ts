@@ -27,6 +27,10 @@ export class ProductController {
   getProducts(): Promise<Product[]> {
     return this.productService.getProducts();
   }
+  @Get('/all/:userid')
+  getProductsWithUserLiked(@Param('userid', ParseIntPipe) userId: number) {
+    return this.productService.getProductsWithUserLiked(userId);
+  }
 
   // id로 상품 얻기
   @Get('/:id')
@@ -39,6 +43,7 @@ export class ProductController {
   // 이름으로 상품 얻기
   @Get('/:name')
   searchProduct(@Param('name') name: string): Promise<Product> {
+    console.log(name);
     return this.productService.getProductByName(name);
   }
 

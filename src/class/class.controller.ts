@@ -31,6 +31,11 @@ export class ClassController {
     return this.classService.getAllClasses();
   }
 
+  @Get('/all/:userid')
+  getClassesWithUserLiked(@Param('userid', ParseIntPipe) userId: number) {
+    return this.classService.getClassesWithUserLiked(userId);
+  }
+
   @Get(':id')
   getClassById(@Param('id', ParseIntPipe) id: number) {
     return this.classService.getClassById(id);

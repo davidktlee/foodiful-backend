@@ -5,6 +5,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AuthModule } from 'src/auth/auth.module';
 import { AwsService } from 'src/aws/aws.service';
 import { MulterOptionsFactory } from 'src/common/multer.options';
+import { FavoriteProductRepository } from 'src/favorite-product/favorite-product.repository';
 import { PrismaService } from 'src/prisma.service';
 import { ProductController } from './product.controller';
 import { ProductRepository } from './product.repository';
@@ -22,6 +23,12 @@ import { ProductService } from './product.service';
     JwtModule,
   ],
   controllers: [ProductController],
-  providers: [ProductService, PrismaService, ProductRepository, AwsService],
+  providers: [
+    ProductService,
+    PrismaService,
+    ProductRepository,
+    AwsService,
+    FavoriteProductRepository,
+  ],
 })
 export class ProductModule {}

@@ -14,6 +14,10 @@ export class ClassService {
     return this.classRepository.getAllClasses();
   }
 
+  getClassesWithUserLiked(userId: number) {
+    return;
+  }
+
   getClassById(id: number) {
     return this.classRepository.getClassById(id); // classRepository의 id로 찾은 값 반환
   }
