@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { FavoriteClassRepository } from 'src/favorite-class/favorite-class.repository';
 import { ClassRepository } from './class.repository';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 
 @Injectable()
 export class ClassService {
-  constructor(private classRepository: ClassRepository) {}
+  constructor(
+    private classRepository: ClassRepository,
+    private favoriteClassRepository: FavoriteClassRepository,
+  ) {}
   create(createClassDto: CreateClassDto) {
     return this.classRepository.createClass(createClassDto);
   }
@@ -14,8 +18,19 @@ export class ClassService {
     return this.classRepository.getAllClasses();
   }
 
-  getClassesWithUserLiked(userId: number) {
-    return;
+  async getClassesWithUserLiked(userId: number) {
+    const classIdsWithLiked =
+      await this.favoriteClassRepository.getLikedClassIds(userId);
+    const classes = await this.classRepository.getAllClasses();
+
+    const classWithLiked = classes.map((item) => {
+      return {
+        ...item,
+        isLiked: classIdsWithLiked.includes(item.id),
+      };
+    });
+
+    return classWithLiked;
   }
 
   getClassById(id: number) {
