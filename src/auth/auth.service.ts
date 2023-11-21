@@ -166,12 +166,16 @@ export class AuthService {
 
   async updateUser(userId, updateUserData: UpdateUserDto) {
     const user = await this.userRepository.getUserById(userId);
-    const checkedPassword = await this.compare(
-      updateUserData.password,
-      user.password,
-    );
-    if (!checkedPassword) {
-      throw new UnauthorizedException('비밀번호 불일치');
+    // 패스워드가 있다면 변경 할 패스워드가 있다는 뜻이니 password 비교
+    // 없다면 그냥 패스워드 그대로 쓰게끔
+    if (updateUserData.password) {
+      const checkedPassword = await this.compare(
+        updateUserData.password,
+        user.password,
+      );
+      if (!checkedPassword) {
+        throw new UnauthorizedException('비밀번호 불일치');
+      }
     }
     const accessToken = await this.getAccessToken(
       user.email,
@@ -188,7 +192,8 @@ export class AuthService {
       cookieWithRefreshToken.refreshToken,
     );
     await this.userRepository.updateUser(userId, updateUserData);
-    return { accessToken, cookieWithRefreshToken, user };
+    const updatedUserData = { ...updateUserData, id: user.id, role: user.role };
+    return { accessToken, cookieWithRefreshToken, updatedUserData };
 
     // 유저 불러온 후 패스워드 비교
     // jwt token 및 refresh token  재 생성

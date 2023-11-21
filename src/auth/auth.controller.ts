@@ -82,7 +82,7 @@ export class AuthController {
     return { email, name, phone };
   }
 
-  @Patch('/update')
+  @Patch('/update/:id')
   @ApiBearerAuth()
   @ApiOkResponse({
     description: '업데이트가 완료되었습니다.',
@@ -92,8 +92,24 @@ export class AuthController {
   async updateUser(
     @Param('id', ParseIntPipe) userId,
     @Body() updateUserData: UpdateUserDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    return this.authService.updateUser(userId, updateUserData);
+    const {
+      accessToken,
+      cookieWithRefreshToken: { refreshToken, ...refreshOption },
+      updatedUserData,
+    } = await this.authService.updateUser(userId, updateUserData);
+    res.cookie('refresh', refreshToken, refreshOption);
+    return {
+      user: {
+        email: updatedUserData.email,
+        name: updatedUserData.name,
+        phone: updatedUserData.phone,
+        token: accessToken,
+        role: updatedUserData.role,
+        id: updatedUserData.id,
+      },
+    };
   }
 
   @Get('/authenticate')
