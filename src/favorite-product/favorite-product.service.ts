@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
 import { UpdateFavoriteProductDto } from './dto/update-favorite-product.dto';
+import { FavoriteProductRepository } from './favorite-product.repository';
 
 @Injectable()
 export class FavoriteProductService {
+  constructor(private favoriteProductRepository: FavoriteProductRepository) {}
   create(createFavoriteProductDto: CreateFavoriteProductDto) {
-    return 'This action adds a new favoriteProduct';
+    return this.favoriteProductRepository.create(createFavoriteProductDto);
   }
 
-  findAll() {
-    return `This action returns all favoriteProduct`;
+  getFavoriteProductByUserId(userId: number) {
+    return this.favoriteProductRepository.getFavoriteProductByUserId(userId);
   }
 
   findOne(id: number) {

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FavoriteClassService } from './favorite-class.service';
 import { CreateFavoriteClassDto } from './dto/create-favorite-class.dto';
@@ -20,22 +21,9 @@ export class FavoriteClassController {
     return this.favoriteClassService.create(createFavoriteClassDto);
   }
 
-  @Get()
-  findAll() {
-    return this.favoriteClassService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoriteClassService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteClassDto: UpdateFavoriteClassDto,
-  ) {
-    return this.favoriteClassService.update(+id, updateFavoriteClassDto);
+  @Get('/all/:userid')
+  getFavoriteClassByUserId(@Param('userid', ParseIntPipe) userId: number) {
+    return this.favoriteClassService.getFavoriteClassByUserId(userId);
   }
 
   @Delete(':id')

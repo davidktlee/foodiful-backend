@@ -36,18 +36,29 @@ export class ProductService {
   }
 
   async getProductsWithUserLiked(userId: number) {
-    const productIdsWithLiked =
-      await this.favoriteProductRepository.getLikedProductIds(userId);
-    const products = await this.productRepository.getProducts();
+    try {
+      const products = await this.productRepository.getProducts();
+      if (products.length === 0) {
+        throw new ForbiddenException('상품이 없습니다');
+      }
 
-    const productsWithLiked = products.map((product) => {
-      return {
-        ...product,
-        isLiked: productIdsWithLiked.includes(product.id),
-      };
-    });
+      const productIdsWithLiked =
+        await this.favoriteProductRepository.getLikedProductIds(userId);
+      if (productIdsWithLiked.length === 0) {
+        return products;
+      } else {
+        const productsWithLiked = products.map((product) => {
+          return {
+            ...product,
+            isLiked: productIdsWithLiked.includes(product.id),
+          };
+        });
 
-    return productsWithLiked;
+        return productsWithLiked;
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('서버에서 알 수 없는 에 발생');
+    }
   }
 
   async getProductByName(name: string): Promise<Product> {

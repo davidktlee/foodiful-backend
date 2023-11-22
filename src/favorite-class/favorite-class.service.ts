@@ -1,23 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { ClassRepository } from 'src/class/class.repository';
 import { CreateFavoriteClassDto } from './dto/create-favorite-class.dto';
 import { UpdateFavoriteClassDto } from './dto/update-favorite-class.dto';
+import { FavoriteClassRepository } from './favorite-class.repository';
 
 @Injectable()
 export class FavoriteClassService {
+  constructor(
+    private favoriteClassRepository: FavoriteClassRepository,
+    private classRepository: ClassRepository,
+  ) {}
   create(createFavoriteClassDto: CreateFavoriteClassDto) {
-    return 'This action adds a new favoriteClass';
+    return this.favoriteClassRepository.create(createFavoriteClassDto);
   }
 
-  findAll() {
-    return `This action returns all favoriteClass`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favoriteClass`;
-  }
-
-  update(id: number, updateFavoriteClassDto: UpdateFavoriteClassDto) {
-    return `This action updates a #${id} favoriteClass`;
+  async getFavoriteClassByUserId(userId: number) {
+    return this.favoriteClassRepository.getFavoriteClassByUserId(userId);
   }
 
   remove(id: number) {

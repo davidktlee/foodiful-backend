@@ -27,6 +27,7 @@ export class ProductController {
   getProducts(): Promise<Product[]> {
     return this.productService.getProducts();
   }
+
   @Get('/all/:userid')
   getProductsWithUserLiked(@Param('userid', ParseIntPipe) userId: number) {
     return this.productService.getProductsWithUserLiked(userId);

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FavoriteProductService } from './favorite-product.service';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
@@ -22,22 +23,14 @@ export class FavoriteProductController {
     return this.favoriteProductService.create(createFavoriteProductDto);
   }
 
-  @Get()
-  findAll() {
-    return this.favoriteProductService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoriteProductService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteProductDto: UpdateFavoriteProductDto,
+  @Get('/:userid')
+  async getFavoriteProductByUserId(
+    @Param('userid', ParseIntPipe) userId: number,
   ) {
-    return this.favoriteProductService.update(+id, updateFavoriteProductDto);
+    const res = await this.favoriteProductService.getFavoriteProductByUserId(
+      userId,
+    );
+    return res.map((item) => item.product);
   }
 
   @Delete(':id')

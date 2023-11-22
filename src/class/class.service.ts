@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { FavoriteClassRepository } from 'src/favorite-class/favorite-class.repository';
 import { ClassRepository } from './class.repository';
 import { CreateClassDto } from './dto/create-class.dto';
@@ -19,18 +24,27 @@ export class ClassService {
   }
 
   async getClassesWithUserLiked(userId: number) {
-    const classIdsWithLiked =
-      await this.favoriteClassRepository.getLikedClassIds(userId);
-    const classes = await this.classRepository.getAllClasses();
+    try {
+      const classes = await this.classRepository.getAllClasses();
+      if (classes.length === 0)
+        throw new ForbiddenException('클래스가 없습니다.');
 
-    const classWithLiked = classes.map((item) => {
-      return {
-        ...item,
-        isLiked: classIdsWithLiked.includes(item.id),
-      };
-    });
-
-    return classWithLiked;
+      const classIdsWithLiked =
+        await this.favoriteClassRepository.getLikedClassIds(userId);
+      if (classIdsWithLiked.length === 0) {
+        return classes;
+      } else {
+        const classesWithLiked = classes.map((item) => {
+          return {
+            ...item,
+            isLiked: classIdsWithLiked.includes(item.id),
+          };
+        });
+        return classesWithLiked;
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+    }
   }
 
   getClassById(id: number) {
