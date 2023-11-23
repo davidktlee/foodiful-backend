@@ -6,8 +6,8 @@ import { FavoriteProductRepository } from './favorite-product.repository';
 @Injectable()
 export class FavoriteProductService {
   constructor(private favoriteProductRepository: FavoriteProductRepository) {}
-  create(createFavoriteProductDto: CreateFavoriteProductDto) {
-    return this.favoriteProductRepository.create(createFavoriteProductDto);
+  create(userId: number, productId: number) {
+    return this.favoriteProductRepository.create(userId, productId);
   }
 
   getFavoriteProductByUserId(userId: number) {

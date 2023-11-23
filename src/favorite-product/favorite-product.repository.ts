@@ -29,10 +29,11 @@ export class FavoriteProductRepository {
     });
   }
 
-  async create(createFavoriteProductDto: CreateFavoriteProductDto) {
+  async create(userId: number, productId: number) {
     return this.prisma.favoriteProduct.create({
       data: {
-        ...createFavoriteProductDto,
+        userId,
+        productId,
       },
     });
   }
