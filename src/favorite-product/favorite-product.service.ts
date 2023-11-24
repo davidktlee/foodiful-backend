@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
 import { UpdateFavoriteProductDto } from './dto/update-favorite-product.dto';
 import { FavoriteProductRepository } from './favorite-product.repository';
@@ -11,7 +11,11 @@ export class FavoriteProductService {
   }
 
   getFavoriteProductByUserId(userId: number) {
-    return this.favoriteProductRepository.getFavoriteProductByUserId(userId);
+    try {
+      return this.favoriteProductRepository.getFavoriteProductByUserId(userId);
+    } catch {
+      throw new InternalServerErrorException('서버에서 에러 발생');
+    }
   }
 
   findOne(id: number) {
@@ -22,7 +26,7 @@ export class FavoriteProductService {
     return `This action updates a #${id} favoriteProduct`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} favoriteProduct`;
+  remove(userId: number, productId: number) {
+    return this.favoriteProductRepository.delete(userId, productId);
   }
 }

@@ -43,8 +43,9 @@ export class FavoriteProductController {
     return res.map((item) => item.product);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoriteProductService.remove(+id);
+  remove(@GetUser() user: User, @Param('id', ParseIntPipe) productId: number) {
+    return this.favoriteProductService.remove(user.id, productId);
   }
 }

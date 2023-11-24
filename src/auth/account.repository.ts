@@ -5,9 +5,10 @@ import { PrismaService } from 'src/prisma.service';
 export class AccountRepository {
   constructor(private readonly prisma: PrismaService) {}
   async updateRefreshToken(userId: number, refreshToken: string) {
-    return this.prisma.account.update({
+    return this.prisma.account.upsert({
       where: { userId },
-      data: { refreshToken },
+      update: { refreshToken },
+      create: { userId, refreshToken },
     });
   }
 }

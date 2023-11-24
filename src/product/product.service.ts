@@ -44,18 +44,15 @@ export class ProductService {
 
       const productIdsWithLiked =
         await this.favoriteProductRepository.getLikedProductIds(userId);
-      if (productIdsWithLiked.length === 0) {
-        return products;
-      } else {
-        const productsWithLiked = products.map((product) => {
-          return {
-            ...product,
-            isLiked: productIdsWithLiked.includes(product.id),
-          };
-        });
 
-        return productsWithLiked;
-      }
+      const productsWithLiked = products.map((product) => {
+        return {
+          ...product,
+          isLiked: productIdsWithLiked.includes(product.id),
+        };
+      });
+
+      return productsWithLiked;
     } catch (error) {
       throw new InternalServerErrorException('서버에서 알 수 없는 에 발생');
     }

@@ -75,10 +75,11 @@ model Product {
 }
 
 model FavoriteProduct {
-  userId Int @unique
+  userId Int 
   user User @relation(fields: [userId], references: [id])
-  productId Int
+  productId Int 
   product Product @relation(fields: [productId], references: [id])
+  @@id([userId, productId])
 }
 
 model Order {

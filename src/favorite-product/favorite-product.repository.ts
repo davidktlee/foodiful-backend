@@ -37,4 +37,9 @@ export class FavoriteProductRepository {
       },
     });
   }
+  async delete(userId: number, productId: number) {
+    return this.prisma.favoriteProduct.deleteMany({
+      where: { userId, productId },
+    });
+  }
 }
