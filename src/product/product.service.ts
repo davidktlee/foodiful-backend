@@ -1,13 +1,20 @@
 import { S3 } from '@aws-sdk/client-s3';
 import {
   BadRequestException,
+  CacheInterceptor,
+  CACHE_MANAGER,
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { Cache } from 'cache-manager';
+import { AuthService } from 'src/auth/auth.service';
 import { UploadFilesDto } from 'src/aws/dto/uploadFile-dto';
 import { FavoriteProductRepository } from 'src/favorite-product/favorite-product.repository';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -20,16 +27,27 @@ export class ProductService {
   constructor(
     private productRepository: ProductRepository,
     private favoriteProductRepository: FavoriteProductRepository,
+    private authService: AuthService,
     private readonly config: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
-  async getProducts(): Promise<Product[]> {
+  async getProducts(token?: string): Promise<Product[]> {
     try {
-      const products = await this.productRepository.getProducts();
-      if (products.length === 0) {
-        throw new ForbiddenException('상품이 없습니다');
+      if (token) {
+        const isVerified = await this.authService.validAccessToken(token);
+        if (isVerified) {
+          const { id } = this.authService.decodeJWTToken(token);
+
+          return this.getProductsWithUserLiked(id);
+        }
+      } else {
+        const products = await this.productRepository.getProducts();
+        if (products.length === 0) {
+          throw new ForbiddenException('상품이 없습니다');
+        }
+        return products;
       }
-      return products;
     } catch (error) {
       throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
     }

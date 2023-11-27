@@ -3,13 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { GetUserToken } from 'src/auth/get-user-token.decorator';
+import { GetUser } from 'src/auth/get-user.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -24,8 +28,9 @@ export class ProductController {
   // 전체 상품 얻기
   @Get('/all')
   // @UseGuards(AuthGuard())
-  getProducts(): Promise<Product[]> {
-    return this.productService.getProducts();
+  // getProducts(@GetUserToken() token: string): Promise<Product[]> {
+  getProducts(@GetUserToken() token: string) {
+    return this.productService.getProducts(token);
   }
 
   @Get('/all/:userid')

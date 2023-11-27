@@ -20,6 +20,7 @@ import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccountRepository } from './account.repository';
+import axios from 'axios';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)
@@ -147,6 +148,8 @@ export class AuthService {
         user.phone,
         user.id,
       );
+      console.log(accessToken);
+      this.validAccessToken(accessToken);
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
       );
@@ -209,6 +212,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(
       { email, name, role, phone, id },
       {
+        secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY'),
         expiresIn: '1h',
       },
     );
@@ -244,13 +248,7 @@ export class AuthService {
 
   async validAccessToken(accessToken) {
     try {
-      const verified = this.jwtService.verify(
-        accessToken,
-        this.configService.get('JWT_ACCESS_TOKEN_SECRET_KEY'),
-      );
-      if (verified) {
-        return 'verified';
-      }
+      const verified = this.jwtService.verify(accessToken);
       return verified;
     } catch (error) {
       throw new UnauthorizedException('토큰 검증 에러');
@@ -297,5 +295,8 @@ export class AuthService {
   async transform(willHash): Promise<User['password']> {
     willHash = await bcrypt.hash(willHash, 10);
     return willHash;
+  }
+  decodeJWTToken(token: string): any {
+    return this.jwtService.decode(token);
   }
 }
