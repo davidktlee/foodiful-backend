@@ -23,10 +23,10 @@ export class ProductReviewService {
     }
   }
 
-  async getAllProductReviewsByProductId(id: number) {
+  async getAllProductReviewsByProductId(productId: number) {
     try {
       const productReviews =
-        await this.productReviewRepository.getAllProductReviews(id);
+        await this.productReviewRepository.getAllProductReviews(productId);
       if (productReviews.length < 0)
         throw new NotFoundException('리뷰가 없습니다.');
       return productReviews;

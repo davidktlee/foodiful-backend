@@ -6,9 +6,9 @@ import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 @Injectable()
 export class ProductReviewRepository {
   constructor(private prisma: PrismaService) {}
-  async getAllProductReviews(id: number) {
+  async getAllProductReviews(productId: number) {
     return this.prisma.productReview.findMany({
-      where: { productId: id },
+      where: { productId },
       include: { product: true, user: true },
     });
   }

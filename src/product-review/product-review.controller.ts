@@ -24,8 +24,10 @@ export class ProductReviewController {
   }
 
   @Get(':id')
-  getAllProductReviewsByProductId(@Param('id', ParseIntPipe) id: number) {
-    return this.productReviewService.getAllProductReviewsByProductId(id);
+  getAllProductReviewsByProductId(
+    @Param('id', ParseIntPipe) productId: number,
+  ) {
+    return this.productReviewService.getAllProductReviewsByProductId(productId);
   }
 
   // @Get(':id')

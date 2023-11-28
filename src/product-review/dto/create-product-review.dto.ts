@@ -12,10 +12,6 @@ export class CreateProductReviewDto {
   @Max(5)
   rating: number;
 
-  @ApiProperty({ required: true, example: true })
-  @IsBoolean()
-  isSecret: boolean;
-
   @ApiProperty({
     required: true,
     example: ['https://aws...', 'https://aws...'],
