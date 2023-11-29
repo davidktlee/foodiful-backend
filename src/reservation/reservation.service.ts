@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { User } from '@prisma/client';
 import dayjs from 'dayjs';
 import { ClassRepository } from 'src/class/class.repository';
 import { UserRepository } from 'src/user/user.repository';
@@ -23,14 +24,16 @@ export class ReservationService {
     return reservations;
   }
 
-  async getReservationByUserId(userId: number) {
-    return this.userRepository.getReservationByUserId(userId);
+  getReservationByReservationId(id: number) {
+    return this.reservationRepository.getReservationByReservationId(id);
   }
 
-  async createReservation(reservation: CreateReservationDto) {
-    const { id } = await this.userRepository.getUserByUserEmail(
-      reservation.userEmail,
-    );
+  getReservationByUserId(userId: number) {
+    return this.reservationRepository.getReservationByUserId(userId);
+  }
+
+  async createReservation(reservation: CreateReservationDto, user: User) {
+    const { id } = await this.userRepository.getUserById(user.id);
 
     const { classDuration } = await this.classRepository.getClassById(
       reservation.classId,

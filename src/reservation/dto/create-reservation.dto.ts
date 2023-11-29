@@ -6,7 +6,4 @@ export class CreateReservationDto {
 
   @IsNumber()
   readonly classId: number;
-
-  @IsString()
-  readonly userEmail: string;
 }

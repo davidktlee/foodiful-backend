@@ -9,6 +9,18 @@ export class ReservationRepository {
     return this.prisma.reservation.findMany();
   }
 
+  getReservationByReservationId(id: number) {
+    return this.prisma.reservation.findUnique({
+      where: { id },
+    });
+  }
+
+  getReservationByUserId(userId: number) {
+    return this.prisma.reservation.findMany({
+      where: { userId },
+    });
+  }
+
   getReservationByClassId(id: number) {
     return this.prisma.reservation.findMany({
       where: { classId: id },

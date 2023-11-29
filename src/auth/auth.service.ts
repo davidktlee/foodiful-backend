@@ -148,8 +148,6 @@ export class AuthService {
         user.phone,
         user.id,
       );
-      console.log(accessToken);
-      this.validAccessToken(accessToken);
       const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
         userData.email,
       );

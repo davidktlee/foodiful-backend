@@ -119,6 +119,10 @@ export class UserService {
     }
   }
 
+  getReservationByUserId(userId: number) {
+    return this.userRepository.getReservationByUserId(userId);
+  }
+
   async getOrderByUserId(id: number) {
     try {
       const user = await this.userRepository.getUserById(id);

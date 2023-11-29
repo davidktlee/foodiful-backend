@@ -14,6 +14,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserToken } from 'src/auth/get-user-token.decorator';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -27,8 +28,6 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
   // 전체 상품 얻기
   @Get('/all')
-  // @UseGuards(AuthGuard())
-  // getProducts(@GetUserToken() token: string): Promise<Product[]> {
   getProducts(@GetUserToken() token: string) {
     return this.productService.getProducts(token);
   }
