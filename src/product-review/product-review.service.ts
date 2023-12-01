@@ -3,18 +3,29 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ProductRepository } from 'src/product/product.repository';
+import { UserRepository } from 'src/user/user.repository';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 import { ProductReviewRepository } from './product-review.repository';
 
 @Injectable()
 export class ProductReviewService {
-  constructor(private productReviewRepository: ProductReviewRepository) {}
+  constructor(
+    private productReviewRepository: ProductReviewRepository,
+    private userRepository: UserRepository,
+    private productRepository: ProductRepository,
+  ) {}
   createProductReview(createProductReviewDto: CreateProductReviewDto) {
     try {
-      // const user = this.userService.getUser(userId);
-      // const product = this.productRepository.getProduct(productId)
-      // if(!user || !product) throw new NotFoundError()
+      const user = this.userRepository.getUserById(
+        createProductReviewDto.userId,
+      );
+      const product = this.productRepository.getProductById(
+        createProductReviewDto.productId,
+      );
+      if (!user || !product)
+        throw new NotFoundException('상품이 없거나 유저가 없습니다');
       return this.productReviewRepository.createProductReview(
         createProductReviewDto,
       );
@@ -57,7 +68,15 @@ export class ProductReviewService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} productReview`;
+  deleteProductReview(id: number) {
+    try {
+      const productReview =
+        this.productReviewRepository.getProductReviewById(id);
+      if (!productReview)
+        throw new NotFoundException('삭제하실 리뷰가 없습니다');
+      return this.productReviewRepository.deleteProductReview(id);
+    } catch (error) {
+      throw new InternalServerErrorException('서버에러 입니다.');
+    }
   }
 }

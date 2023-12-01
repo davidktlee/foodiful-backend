@@ -7,16 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductReviewService } from './product-review.service';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('product-review')
 export class ProductReviewController {
   constructor(private readonly productReviewService: ProductReviewService) {}
 
   @Post()
+  @UseGuards(JwtGuard)
   createProductReview(@Body() createProductReviewDto: CreateProductReviewDto) {
     return this.productReviewService.createProductReview(
       createProductReviewDto,
@@ -47,7 +50,8 @@ export class ProductReviewController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productReviewService.remove(id);
+  @UseGuards(JwtGuard)
+  deleteProductReview(@Param('id', ParseIntPipe) id: number) {
+    return this.productReviewService.deleteProductReview(id);
   }
 }

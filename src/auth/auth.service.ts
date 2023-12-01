@@ -134,6 +134,10 @@ export class AuthService {
   async loginUser(userData: LoginUserDto) {
     try {
       const user = await this.userRepository.getUserByUserEmail(userData.email);
+      if (!user)
+        throw new NotFoundException(
+          '존재하지 않는 이메일입니다. 이메일을 확인해주세요',
+        );
       const checkedPassword = await this.compare(
         userData.password,
         user.password,
