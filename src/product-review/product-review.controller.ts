@@ -39,6 +39,7 @@ export class ProductReviewController {
   // }
 
   @Patch(':id')
+  @UseGuards(JwtGuard)
   updateProductReview(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductReviewDto: UpdateProductReviewDto,
