@@ -6,31 +6,37 @@ import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 @Injectable()
 export class ProductReviewRepository {
   constructor(private prisma: PrismaService) {}
-  async getAllProductReviews(productId: number) {
+  getAllProductReviews(productId: number) {
     return this.prisma.productReview.findMany({
       where: { productId },
       include: { product: true, user: true },
     });
   }
 
-  async getProductReviewById(id: number) {
+  getProductReviewById(id: number) {
     return this.prisma.productReview.findUnique({
       where: { id },
     });
   }
 
-  async createProductReview(createProductReviewDto: CreateProductReviewDto) {
+  createProductReview(createProductReviewDto: CreateProductReviewDto) {
     return this.prisma.productReview.create({
       data: { ...createProductReviewDto },
     });
   }
-  async updateProductReview(
+  updateProductReview(
     id: number,
     updateProductReviewDto: UpdateProductReviewDto,
   ) {
     return this.prisma.productReview.update({
       where: { id },
       data: { ...updateProductReviewDto },
+    });
+  }
+
+  deleteProductReview(id: number) {
+    return this.prisma.productReview.delete({
+      where: { id },
     });
   }
 }

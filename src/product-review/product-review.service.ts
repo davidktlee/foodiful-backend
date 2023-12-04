@@ -46,10 +46,6 @@ export class ProductReviewService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} productReview`;
-  }
-
   updateProductReview(
     id: number,
     updateProductReviewDto: UpdateProductReviewDto,

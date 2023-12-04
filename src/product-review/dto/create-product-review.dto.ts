@@ -14,7 +14,7 @@ export class CreateProductReviewDto {
 
   @ApiProperty({
     required: true,
-    example: ['https://aws...', 'https://aws...'],
+    example: 'https://aws...',
   })
   @IsString()
   reviewImg: string;

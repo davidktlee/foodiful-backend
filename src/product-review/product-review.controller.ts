@@ -33,11 +33,6 @@ export class ProductReviewController {
     return this.productReviewService.getAllProductReviewsByProductId(productId);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id', ParseIntPipe) id: number) {
-  //   return this.productReviewService.findOne(id);
-  // }
-
   @Patch(':id')
   @UseGuards(JwtGuard)
   updateProductReview(
