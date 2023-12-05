@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
 import { UpdateFavoriteProductDto } from './dto/update-favorite-product.dto';
 import { FavoriteProductRepository } from './favorite-product.repository';
@@ -10,9 +14,13 @@ export class FavoriteProductService {
     return this.favoriteProductRepository.create(userId, productId);
   }
 
-  getFavoriteProductByUserId(userId: number) {
+  async getFavoriteProductByUserId(userId: number) {
     try {
-      return this.favoriteProductRepository.getFavoriteProductByUserId(userId);
+      const favoriteProducts =
+        await this.favoriteProductRepository.getFavoriteProductByUserId(userId);
+      if (favoriteProducts.length < 0)
+        throw new NotFoundException('좋아요 한 상품이 없습니다.');
+      else favoriteProducts.map((products) => products.product);
     } catch {
       throw new InternalServerErrorException('서버에서 에러 발생');
     }

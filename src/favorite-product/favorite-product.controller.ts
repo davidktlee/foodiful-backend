@@ -34,13 +34,8 @@ export class FavoriteProductController {
   }
 
   @Get('/:userid')
-  async getFavoriteProductByUserId(
-    @Param('userid', ParseIntPipe) userId: number,
-  ) {
-    const res = await this.favoriteProductService.getFavoriteProductByUserId(
-      userId,
-    );
-    return res.map((item) => item.product);
+  getFavoriteProductByUserId(@Param('userid', ParseIntPipe) userId: number) {
+    return this.favoriteProductService.getFavoriteProductByUserId(userId);
   }
 
   @UseGuards(JwtGuard)
