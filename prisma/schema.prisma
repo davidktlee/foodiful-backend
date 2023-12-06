@@ -8,25 +8,25 @@ datasource db {
 }
 
 model User {
-  name           String
-  phone          String          @unique
-  password       String
-  createdAt      DateTime        @default(now())
-  email          String          @unique
-  id             Int             @id @default(autoincrement())
-  updatedAt      DateTime?
-  deleted        Boolean         @default(false)
-  role           UserRole        @default(PUBLIC)
-  account        Account?
-  board          Board?
-  Cart           Cart?
-  classReviews   ClassReview[]
-  message        Message[]
-  order          Order[]
-  productReviews ProductReview[]
-  reservations   Reservation[]
-  favoriteClass FavoriteClass[]
+  name            String
+  phone           String            @unique
+  password        String
+  createdAt       DateTime          @default(now())
+  email           String            @unique
+  id              Int               @id @default(autoincrement())
+  updatedAt       DateTime?
+  deleted         Boolean           @default(false)
+  role            UserRole          @default(PUBLIC)
+  account         Account?
+  board           Board?
+  Cart            Cart?
+  classReviews    ClassReview[]
+  favoriteClass   FavoriteClass?
   favoriteProduct FavoriteProduct[]
+  message         Message[]
+  order           Order[]
+  productReviews  ProductReview[]
+  reservations    Reservation[]
 }
 
 model Account {
@@ -38,73 +38,74 @@ model Account {
 }
 
 model Class {
-  name          String        @unique
+  name          String          @unique
   price         Int
-  discount      Int           @default(0)
+  discount      Int             @default(0)
   description   String
   classDuration Int
   descImg       String[]
-  id            Int           @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   reviews       ClassReview[]
-  reservation   Reservation[]
   favoriteClass FavoriteClass[]
+  reservation   Reservation[]
 }
 
 model FavoriteClass {
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
+  userId  Int   @unique
   classId Int
-  class Class @relation(fields: [classId], references: [id])
+  class   Class @relation(fields: [classId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
 }
 
 model Product {
-  name         String          @unique
-  price        Int
-  discount     Int
-  description  String
-  descImg      String[]
-  deliver      Boolean
-  categories   String[]
-  id           Int             @id @default(autoincrement())
-  quantity     Int             @default(0)
-  subTitle     String
-  orderProduct OrderProduct[]
-  carts        ProductOnCart[]
-  reviews      ProductReview[]
+  name            String            @unique
+  price           Int
+  discount        Int
+  description     String
+  descImg         String[]
+  deliver         Boolean
+  categories      String[]
+  id              Int               @id @default(autoincrement())
+  subTitle        String
+  limitQuantity   Int               @default(0)
   favoriteProduct FavoriteProduct[]
+  orderProduct    OrderProduct[]
+  carts           ProductOnCart[]
+  reviews         ProductReview[]
 }
 
 model FavoriteProduct {
-  userId Int 
-  user User @relation(fields: [userId], references: [id])
-  productId Int 
-  product Product @relation(fields: [productId], references: [id])
+  userId    Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
   @@id([userId, productId])
 }
 
 model Order {
-  orderDate      DateTime       @default(now())
-  quantity       Int
-  userId         Int
-  id             Int            @id @default(autoincrement())
-  deliverAddress String
+  orderDate              DateTime       @default(now())
+  quantity               Int
+  userId                 Int
+  id                     Int            @id @default(autoincrement())
+  deliverAddress         String
+  deliverName            String
+  requirement            String
+  totalPrice             Int
+  deliverPhone           String
+  orderStatus            Boolean        @default(false)
   deliverSpecificAddress String
-  deliverName    String
-  requirement    String
-  totalPrice     Int
-  deliverPhone   String
-  orderStatus    Boolean        @default(false)
-  user           User           @relation(fields: [userId], references: [id])
-  orderProduct   OrderProduct[]
+  user                   User           @relation(fields: [userId], references: [id])
+  orderProduct           OrderProduct[]
 }
 
 model OrderProduct {
   id              Int     @id @default(autoincrement())
   orderCount      Int
   orderPrice      Int
-  additionalCount Int
   productId       Int
   orderId         Int
+  additionalCount Int
   order           Order   @relation(fields: [orderId], references: [id])
   product         Product @relation(fields: [productId], references: [id])
 }
@@ -124,7 +125,7 @@ model ProductReview {
   updatedAt DateTime @updatedAt
   comment   String
   userId    Int
-  productId Int      
+  productId Int
   id        Int      @id @default(autoincrement())
   deleted   Boolean  @default(false)
   rating    Int
@@ -177,10 +178,10 @@ model Message {
 }
 
 model Cart {
-  id       Int             @id @default(autoincrement())
-  userId   Int             @unique
-  User     User            @relation(fields: [userId], references: [id])
-  productOnCart  ProductOnCart[]
+  id            Int             @id @default(autoincrement())
+  userId        Int             @unique
+  User          User            @relation(fields: [userId], references: [id])
+  productOnCart ProductOnCart[]
 
   @@index([userId])
 }

@@ -4,7 +4,7 @@ export class Product {
   subTitle: string;
   price: number;
   discount: number;
-  quantity: number;
+  limitQuantity: number;
   description: string;
   descImg?: string[];
   categories: string[];

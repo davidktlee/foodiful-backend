@@ -17,6 +17,7 @@ import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
 
 @Controller('cart')
+@UseGuards(JwtGuard)
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
@@ -28,29 +29,34 @@ userid로 카트 조회 후 카트가 이미 있다면 productOnCart의 cart id�
 없다면 카트 생성 후 그 카트 id에 위 데이터를 똑같이 넣는다.
    */
   @Post()
-  @UseGuards(JwtGuard)
   create(@GetUser() user: User, @Body() createCartDto: CreateCartDto) {
     return this.cartService.create(createCartDto, user.id);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.cartService.findAll();
-  // }
-
   @Get()
-  @UseGuards(JwtGuard)
   findCartByUserId(@GetUser() user: User) {
     return this.cartService.getCartByUserId(user.id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
-    return this.cartService.update(+id, updateCartDto);
+  @Patch(':cartid/:productid')
+  updateCart(
+    @Param('cartid', ParseIntPipe) cartId: number,
+    @Param('productid', ParseIntPipe) productId: number,
+    @Body() updateCartDto: UpdateCartDto,
+  ) {
+    return this.cartService.updateCart(cartId, productId, updateCartDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartService.remove(+id);
+  @Delete(':cartid/:productid')
+  deleteCartItem(
+    @Param('cartid', ParseIntPipe) cartId: number,
+    @Param('productid', ParseIntPipe) productId: number,
+  ) {
+    return this.cartService.deleteCartItem(cartId, productId);
+  }
+
+  @Delete('/all/:cartid')
+  deleteAllItems(@Param('cartid', ParseIntPipe) cartId: number) {
+    return this.cartService.deleteAllItems(cartId);
   }
 }

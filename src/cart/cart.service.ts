@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
@@ -13,19 +18,27 @@ export class CartService {
   async create(createCartDto: CreateCartDto, userId: number) {
     // 존재하는 카트가 있다면 카트 생성 없이 카트 가져와서 그 카트 id에 데이터 추가
     // 존재하는 카트가 없다면 카트 생성 후 데이터 추가
-    const cart = await this.cartRepository.getCartByUserId(userId);
+    try {
+      const cart = await this.cartRepository.getCartByUserId(userId);
 
-    if (!cart) {
-      const createdCart = await this.cartRepository.createCart(userId);
-      return this.productOnCartRepository.createProductOnCart(
-        createCartDto,
-        createdCart.id,
-      );
-    } else {
-      return this.productOnCartRepository.createProductOnCart(
-        createCartDto,
-        cart.id,
-      );
+      if (!cart) {
+        const createdCart = await this.cartRepository.createCart(userId);
+        return this.productOnCartRepository.createProductOnCart(
+          createCartDto,
+          createdCart.id,
+        );
+      } else {
+        cart.productOnCart.forEach((product) => {
+          if (product.productId === createCartDto.productId)
+            throw new ConflictException('이미 장바구니에 존재하는 상품입니다');
+        });
+        return this.productOnCartRepository.createProductOnCart(
+          createCartDto,
+          cart.id,
+        );
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('서버 에러 발생');
     }
   }
 
@@ -35,20 +48,31 @@ export class CartService {
 
   async getCartByUserId(userId: number) {
     const cart = await this.cartRepository.getCartByUserId(userId);
-
     if (!cart) throw new NotFoundException('장바구니 내역이 없습니다');
-    return cart;
+    return this.getCartProductsCartId(cart.id);
   }
 
   async getCartProductsCartId(cartId: number) {
-    return;
+    try {
+      return this.productOnCartRepository.getProductOnCart(cartId);
+    } catch (error) {
+      throw new InternalServerErrorException('서버 에러 발생');
+    }
   }
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
+  updateCart(cartId: number, productId: number, updateCartDto: UpdateCartDto) {
+    return this.productOnCartRepository.updateProductOnCart(
+      cartId,
+      productId,
+      updateCartDto,
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+  deleteCartItem(cartId: number, productId: number) {
+    return this.productOnCartRepository.deleteProductOnCart(cartId, productId);
+  }
+
+  deleteAllItems(cartId: number) {
+    return this.productOnCartRepository.deleteAllProductOnCart(cartId);
   }
 }
