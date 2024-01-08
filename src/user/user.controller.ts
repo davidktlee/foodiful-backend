@@ -36,6 +36,11 @@ export class UserController {
   async getUsers(): Promise<{ users: User[] }> {
     return this.userService.getUsers();
   }
+  @Get('/order/:id')
+  getOrderByUserId(@Param('id', ParseIntPipe) userId: number) {
+    console.log(userId);
+    return this.userService.getOrderByUserId(userId);
+  }
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
@@ -61,10 +66,5 @@ export class UserController {
     @Body() updateUserData: UpdateUserDto,
   ): Promise<{ updatedUser: User; message: string }> {
     return this.userService.updateUser(id, updateUserData);
-  }
-
-  @Get('/order/:id')
-  getOrderByUserId(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.getOrderByUserId(id);
   }
 }

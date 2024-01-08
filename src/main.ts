@@ -24,6 +24,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
       'http://ec2-13-125-253-140.ap-northeast-2.compute.amazonaws.com/',
     ],
     credentials: true,
