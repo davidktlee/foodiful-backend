@@ -20,7 +20,6 @@ import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccountRepository } from './account.repository';
-import axios from 'axios';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)
@@ -259,7 +258,7 @@ export class AuthService {
 
   async getUserIfRefreshTokenMatches(email, refreshToken) {
     const user = await this.userRepository.getUserByUserEmail(email);
-    if (refreshToken === user.account.refreshToken) {
+    if (refreshToken === user.account?.refreshToken) {
       const { refreshToken: newRefreshToken, ...refreshOption } =
         this.getCookieWithRefreshToken(user.email);
       const newAccessToken = this.getAccessToken(

@@ -4,7 +4,7 @@ import { ProductReviewController } from './product-review.controller';
 import { ProductReviewRepository } from './product-review.repository';
 import { PrismaService } from 'src/prisma.service';
 import { UserRepository } from 'src/user/user.repository';
-import { ProductRepository } from 'src/product/product.repository';
+import { ProductRepository } from 'src/order-product/dto/product/product.repository';
 
 @Module({
   controllers: [ProductReviewController],
