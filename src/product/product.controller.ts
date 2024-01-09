@@ -3,18 +3,14 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserToken } from 'src/auth/get-user-token.decorator';
-import { GetUser } from 'src/auth/get-user.decorator';
-import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { CreateProductDto } from './dto/create-product.dto';

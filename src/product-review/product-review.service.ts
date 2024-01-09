@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { ProductRepository } from 'src/order-product/dto/product/product.repository';
+import { ProductRepository } from 'src/product/product.repository';
 import { UserRepository } from 'src/user/user.repository';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';

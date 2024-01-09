@@ -87,7 +87,7 @@ model Order {
   orderDate              DateTime       @default(now())
   quantity               Int
   userId                 Int
-  id                     Int            @id @default(autoincrement())
+  id                     String            @id
   deliverAddress         String
   deliverName            String
   requirement            String?
@@ -105,7 +105,7 @@ model OrderProduct {
   orderCount      Int
   orderPrice      Int
   productId       Int
-  orderId         Int
+  orderId         String
   additionalCount Int
   order           Order   @relation(fields: [orderId], references: [id])
   product         Product @relation(fields: [productId], references: [id])
@@ -206,6 +206,7 @@ enum UserRole {
 
 enum OrderStatus {
   PROCEEDING
+  SHIPPING
   COMPLETE
   CANCEL
 }

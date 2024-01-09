@@ -37,10 +37,12 @@ export class OrderService {
           });
         },
       );
-      return {
-        createdOrder,
-        createdOrderProduct,
-      };
+      if (createdOrderProduct) {
+        return {
+          createdOrder,
+          createdOrderProduct,
+        };
+      }
     } else {
       throw new InternalServerErrorException('서버에서 에러가 났습니다');
     }

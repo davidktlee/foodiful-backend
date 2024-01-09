@@ -38,7 +38,6 @@ export class UserController {
   }
   @Get('/order/:id')
   getOrderByUserId(@Param('id', ParseIntPipe) userId: number) {
-    console.log(userId);
     return this.userService.getOrderByUserId(userId);
   }
 

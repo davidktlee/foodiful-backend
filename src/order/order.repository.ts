@@ -11,7 +11,6 @@ export class OrderRepository {
       data: {
         ...orderForm,
         userId,
-        orderStatus: 'COMPLETE',
       },
     });
   }
