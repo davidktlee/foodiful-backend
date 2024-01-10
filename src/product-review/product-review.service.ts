@@ -17,21 +17,15 @@ export class ProductReviewService {
     private productRepository: ProductRepository,
   ) {}
   createProductReview(createProductReviewDto: CreateProductReviewDto) {
-    try {
-      const user = this.userRepository.getUserById(
-        createProductReviewDto.userId,
-      );
-      const product = this.productRepository.getProductById(
-        createProductReviewDto.productId,
-      );
-      if (!user || !product)
-        throw new NotFoundException('상품이 없거나 유저가 없습니다');
-      return this.productReviewRepository.createProductReview(
-        createProductReviewDto,
-      );
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = this.userRepository.getUserById(createProductReviewDto.userId);
+    const product = this.productRepository.getProductById(
+      createProductReviewDto.productId,
+    );
+    if (!user || !product)
+      throw new NotFoundException('상품이 없거나 유저가 없습니다');
+    return this.productReviewRepository.createProductReview(
+      createProductReviewDto,
+    );
   }
 
   async getAllProductReviewsByProductId(productId: number) {
@@ -57,25 +51,16 @@ export class ProductReviewService {
   }
 
   async deleteProductReview(id: number) {
-    try {
-      const productReview =
-        await this.productReviewRepository.getProductReviewById(id);
-      if (!productReview)
-        throw new NotFoundException('삭제하실 리뷰가 없습니다');
-      return this.productReviewRepository.deleteProductReview(id);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const productReview =
+      await this.productReviewRepository.getProductReviewById(id);
+    if (!productReview) throw new NotFoundException('삭제하실 리뷰가 없습니다');
+    return this.productReviewRepository.deleteProductReview(id);
   }
 
   async getUserProductReviews(userId: number) {
-    try {
-      const productReviews =
-        await this.productReviewRepository.getUserProductReviews(userId);
-      if (!productReviews) throw new NotFoundException('존재하는 리뷰 없음');
-      return productReviews;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const productReviews =
+      await this.productReviewRepository.getUserProductReviews(userId);
+    if (!productReviews) throw new NotFoundException('존재하는 리뷰 없음');
+    return productReviews;
   }
 }

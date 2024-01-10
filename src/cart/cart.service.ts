@@ -18,27 +18,24 @@ export class CartService {
   async create(createCartDto: CreateCartDto, userId: number) {
     // 존재하는 카트가 있다면 카트 생성 없이 카트 가져와서 그 카트 id에 데이터 추가
     // 존재하는 카트가 없다면 카트 생성 후 데이터 추가
-    try {
-      const cart = await this.cartRepository.getCartByUserId(userId);
 
-      if (!cart) {
-        const createdCart = await this.cartRepository.createCart(userId);
-        return this.productOnCartRepository.createProductOnCart(
-          createCartDto,
-          createdCart.id,
-        );
-      } else {
-        cart.productOnCart.forEach((product) => {
-          if (product.productId === createCartDto.productId)
-            throw new ConflictException('이미 장바구니에 존재하는 상품입니다');
-        });
-        return this.productOnCartRepository.createProductOnCart(
-          createCartDto,
-          cart.id,
-        );
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const cart = await this.cartRepository.getCartByUserId(userId);
+
+    if (!cart) {
+      const createdCart = await this.cartRepository.createCart(userId);
+      return this.productOnCartRepository.createProductOnCart(
+        createCartDto,
+        createdCart.id,
+      );
+    } else {
+      cart.productOnCart.forEach((product) => {
+        if (product.productId === createCartDto.productId)
+          throw new ConflictException('이미 장바구니에 존재하는 상품입니다');
+      });
+      return this.productOnCartRepository.createProductOnCart(
+        createCartDto,
+        cart.id,
+      );
     }
   }
 
@@ -53,11 +50,7 @@ export class CartService {
   }
 
   async getCartProductsCartId(cartId: number) {
-    try {
-      return this.productOnCartRepository.getProductOnCart(cartId);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    return this.productOnCartRepository.getProductOnCart(cartId);
   }
 
   updateCart(cartId: number, productId: number, updateCartDto: UpdateCartDto) {

@@ -33,67 +33,51 @@ export class ProductService {
   ) {}
 
   async getProducts(token?: string): Promise<Product[]> {
-    try {
-      if (token) {
-        const isVerified = await this.authService.validAccessToken(token);
-        if (isVerified) {
-          const { id } = this.authService.decodeJWTToken(token);
+    if (token) {
+      const isVerified = await this.authService.validAccessToken(token);
+      if (isVerified) {
+        const { id } = this.authService.decodeJWTToken(token);
 
-          return this.getProductsWithUserLiked(id);
-        }
-      } else {
-        const products = await this.productRepository.getProducts();
-        if (products.length === 0) {
-          throw new ForbiddenException('상품이 없습니다');
-        }
-        return products;
+        return this.getProductsWithUserLiked(id);
       }
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
-  }
-
-  async getProductsWithUserLiked(userId: number) {
-    try {
+    } else {
       const products = await this.productRepository.getProducts();
       if (products.length === 0) {
         throw new ForbiddenException('상품이 없습니다');
       }
-
-      const productIdsWithLiked =
-        await this.favoriteProductRepository.getLikedProductIds(userId);
-
-      const productsWithLiked = products.map((product) => {
-        return {
-          ...product,
-          isLiked: productIdsWithLiked.includes(product.id),
-        };
-      });
-
-      return productsWithLiked;
-    } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에 발생');
+      return products;
     }
+  }
+
+  async getProductsWithUserLiked(userId: number) {
+    const products = await this.productRepository.getProducts();
+    if (products.length === 0) {
+      throw new ForbiddenException('상품이 없습니다');
+    }
+
+    const productIdsWithLiked =
+      await this.favoriteProductRepository.getLikedProductIds(userId);
+
+    const productsWithLiked = products.map((product) => {
+      return {
+        ...product,
+        isLiked: productIdsWithLiked.includes(product.id),
+      };
+    });
+
+    return productsWithLiked;
   }
 
   async getProductByName(name: string): Promise<Product> {
-    try {
-      const products = await this.productRepository.getProductByName(name);
-      if (!products) throw new NotFoundException('찾으시는 상품이 없습니다');
-      return products;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const products = await this.productRepository.getProductByName(name);
+    if (!products) throw new NotFoundException('찾으시는 상품이 없습니다');
+    return products;
   }
 
   async getProductById(id: number): Promise<Product> {
-    try {
-      const product = await this.productRepository.getProductById(id);
-      if (!product) throw new NotFoundException('찾으시는 상품이 없습니다');
-      return product;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const product = await this.productRepository.getProductById(id);
+    if (!product) throw new NotFoundException('찾으시는 상품이 없습니다');
+    return product;
   }
 
   // async uploadProductImg(files: Express.MulterS3.File[]) {
@@ -131,15 +115,11 @@ export class ProductService {
   }
 
   async addProduct(productData: CreateProductDto) {
-    try {
-      const product = await this.productRepository.getProductByName(
-        productData.name,
-      );
-      if (product) throw new ConflictException('이미 존재하는 상품입니다');
-      return this.productRepository.addProduct(productData);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const product = await this.productRepository.getProductByName(
+      productData.name,
+    );
+    if (product) throw new ConflictException('이미 존재하는 상품입니다');
+    return this.productRepository.addProduct(productData);
   }
 
   // async deleteProduct(id: number) {
@@ -150,14 +130,10 @@ export class ProductService {
   // }
 
   async updateProduct(id: number, updateProductData: UpdateProductDto) {
-    try {
-      const product = await this.getProductById(id);
-      if (!product) {
-        throw new NotFoundException('수정하실 상품이 존재하지 않습니다');
-      }
-      return this.productRepository.updateProduct(id, updateProductData);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const product = await this.getProductById(id);
+    if (!product) {
+      throw new NotFoundException('수정하실 상품이 존재하지 않습니다');
     }
+    return this.productRepository.updateProduct(id, updateProductData);
   }
 }

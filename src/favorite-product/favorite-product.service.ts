@@ -15,16 +15,12 @@ export class FavoriteProductService {
   }
 
   async getFavoriteProductByUserId(userId: number) {
-    try {
-      const favoriteProducts =
-        await this.favoriteProductRepository.getFavoriteProductByUserId(userId);
+    const favoriteProducts =
+      await this.favoriteProductRepository.getFavoriteProductByUserId(userId);
 
-      if (!favoriteProducts.length) {
-        throw new NotFoundException('좋아요 한 상품이 없습니다.');
-      } else return favoriteProducts.map((products) => products.product);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    if (!favoriteProducts.length) {
+      throw new NotFoundException('좋아요 한 상품이 없습니다.');
+    } else return favoriteProducts.map((products) => products.product);
   }
 
   findOne(id: number) {

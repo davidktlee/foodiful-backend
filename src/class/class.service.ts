@@ -24,26 +24,22 @@ export class ClassService {
   }
 
   async getClassesWithUserLiked(userId: number) {
-    try {
-      const classes = await this.classRepository.getAllClasses();
-      if (classes.length === 0)
-        throw new ForbiddenException('클래스가 없습니다.');
+    const classes = await this.classRepository.getAllClasses();
+    if (classes.length === 0)
+      throw new ForbiddenException('클래스가 없습니다.');
 
-      const classIdsWithLiked =
-        await this.favoriteClassRepository.getLikedClassIds(userId);
-      if (classIdsWithLiked.length === 0) {
-        return classes;
-      } else {
-        const classesWithLiked = classes.map((item) => {
-          return {
-            ...item,
-            isLiked: classIdsWithLiked.includes(item.id),
-          };
-        });
-        return classesWithLiked;
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const classIdsWithLiked =
+      await this.favoriteClassRepository.getLikedClassIds(userId);
+    if (classIdsWithLiked.length === 0) {
+      return classes;
+    } else {
+      const classesWithLiked = classes.map((item) => {
+        return {
+          ...item,
+          isLiked: classIdsWithLiked.includes(item.id),
+        };
+      });
+      return classesWithLiked;
     }
   }
 

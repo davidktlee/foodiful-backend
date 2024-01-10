@@ -127,41 +127,37 @@ export class AuthService {
   }
 
   async loginUser(userData: LoginUserDto) {
-    try {
-      const user = await this.userRepository.getUserByUserEmail(userData.email);
-      if (!user)
-        throw new NotFoundException(
-          '존재하지 않는 이메일입니다. 이메일을 확인해주세요',
-        );
-      const checkedPassword = await this.compare(
-        userData.password,
-        user.password,
+    const user = await this.userRepository.getUserByUserEmail(userData.email);
+    if (!user)
+      throw new NotFoundException(
+        '존재하지 않는 이메일입니다. 이메일을 확인해주세요',
       );
-      if (!checkedPassword) {
-        throw new UnauthorizedException('비밀번호 불일치');
-      }
-      const accessToken = await this.getAccessToken(
-        userData.email,
-        user.name,
-        user.role,
-        user.phone,
-        user.id,
-      );
-      const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
-        userData.email,
-      );
-      await this.accountRepository.updateRefreshToken(
-        user.id,
-        cookieWithRefreshToken.refreshToken,
-      );
-      await this.userRepository.loginUser({
-        ...userData,
-        refreshToken: cookieWithRefreshToken.refreshToken,
-      });
-      return { accessToken, cookieWithRefreshToken, user };
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const checkedPassword = await this.compare(
+      userData.password,
+      user.password,
+    );
+    if (!checkedPassword) {
+      throw new UnauthorizedException('비밀번호 불일치');
     }
+    const accessToken = await this.getAccessToken(
+      userData.email,
+      user.name,
+      user.role,
+      user.phone,
+      user.id,
+    );
+    const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
+      userData.email,
+    );
+    await this.accountRepository.updateRefreshToken(
+      user.id,
+      cookieWithRefreshToken.refreshToken,
+    );
+    await this.userRepository.loginUser({
+      ...userData,
+      refreshToken: cookieWithRefreshToken.refreshToken,
+    });
+    return { accessToken, cookieWithRefreshToken, user };
   }
 
   async updateUser(userId, updateUserData: UpdateUserDto) {

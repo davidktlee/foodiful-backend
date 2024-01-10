@@ -29,45 +29,29 @@ export class UserService {
    * @Todo: auth 기능 만든 후 getUsers, getUserById 기능은 관리자 일때만 가능하도록 만들기
    */
   async getUsers(): Promise<User[]> {
-    try {
-      const users = await this.userRepository.getUser();
-      if (users.length === 0) throw new ForbiddenException('회원이 없습니다');
-      return users;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const users = await this.userRepository.getUser();
+    if (users.length === 0) throw new ForbiddenException('회원이 없습니다');
+    return users;
   }
 
   async getUserById(id: number): Promise<User> {
-    try {
-      const user = await this.userRepository.getUserById(id);
-      if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
-      return user;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = await this.userRepository.getUserById(id);
+    if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
+    return user;
   }
 
   async getUserByUserEmail(email: string): Promise<User> {
-    try {
-      const user = await this.userRepository.getUserByUserEmail(email);
-      if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
-      return user;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const user = await this.userRepository.getUserByUserEmail(email);
+    if (!user) throw new NotFoundException('찾으시는 회원이 없습니다');
+    return user;
   }
 
   async deleteUser(id: number): Promise<{ user: User; message: string }> {
-    try {
-      const user = await this.userRepository.getUserById(id);
-      if (!user) throw new NotFoundException('삭제하실 회원이 없습니다');
-      else {
-        await this.userRepository.deleteUser(id);
-        return { user, message: '회원 삭제가 완료되었습니다.' };
-      }
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const user = await this.userRepository.getUserById(id);
+    if (!user) throw new NotFoundException('삭제하실 회원이 없습니다');
+    else {
+      await this.userRepository.deleteUser(id);
+      return { user, message: '회원 삭제가 완료되었습니다.' };
     }
   }
 
@@ -97,42 +81,33 @@ export class UserService {
     id: number,
     updateUserData: UpdateUserDto,
   ): Promise<{ updatedUser; message: string }> {
-    try {
-      const user = await this.userRepository.getUserById(id);
-      if (!user)
-        throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
-      else {
-        // user와 updateUserData 비교 로직
-        for (const key in user) {
-          if (
-            !!user[key] &&
-            !!updateUserData[key] &&
-            user[key] !== updateUserData[key]
-          ) {
-            user[key] = updateUserData[key];
-          }
+    const user = await this.userRepository.getUserById(id);
+    if (!user) throw new NotFoundException('수정하실 회원이 존재하지 않습니다');
+    else {
+      // user와 updateUserData 비교 로직
+      for (const key in user) {
+        if (
+          !!user[key] &&
+          !!updateUserData[key] &&
+          user[key] !== updateUserData[key]
+        ) {
+          user[key] = updateUserData[key];
         }
-
-        const updatedUser = await this.userRepository.updateUser(id, {
-          ...user,
-        });
-        return { updatedUser, message: '수정이 완료되었습니다.' };
       }
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+
+      const updatedUser = await this.userRepository.updateUser(id, {
+        ...user,
+      });
+      return { updatedUser, message: '수정이 완료되었습니다.' };
     }
   }
 
   async getUserProductReviews(userId: number) {
-    try {
-      const productReviews =
-        await this.productReviewService.getUserProductReviews(userId);
-      console.log(productReviews);
-      if (!productReviews.length)
-        throw new NotFoundException('상품 리뷰 존재하지 않음');
-      return productReviews;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const productReviews =
+      await this.productReviewService.getUserProductReviews(userId);
+
+    if (!productReviews.length)
+      throw new NotFoundException('상품 리뷰 존재하지 않음');
+    return productReviews;
   }
 }

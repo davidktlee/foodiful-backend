@@ -19,37 +19,24 @@ export class ReservationService {
   ) {}
 
   async getAllReservations() {
-    try {
-      const reservations =
-        await this.reservationRepository.getAllReservations();
-      if (!reservations.length)
-        throw new NotFoundException('예약이 존재하지 않습니다');
-      return reservations;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const reservations = await this.reservationRepository.getAllReservations();
+    if (!reservations.length)
+      throw new NotFoundException('예약이 존재하지 않습니다');
+    return reservations;
   }
 
   async getReservationByReservationId(id: number) {
-    try {
-      const reservations =
-        await this.reservationRepository.getReservationByReservationId(id);
-      if (!reservations) throw new NotFoundException('예약 없음');
-      return reservations;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const reservations =
+      await this.reservationRepository.getReservationByReservationId(id);
+    if (!reservations) throw new NotFoundException('예약 없음');
+    return reservations;
   }
 
   async getReservationByUserId(userId: number) {
-    try {
-      const reservations =
-        await this.reservationRepository.getReservationByUserId(userId);
-      if (!reservations.length) throw new NotFoundException('예약 없음');
-      return reservations;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
-    }
+    const reservations =
+      await this.reservationRepository.getReservationByUserId(userId);
+    if (!reservations.length) throw new NotFoundException('예약 없음');
+    return reservations;
   }
 
   async createReservation(reservation: CreateReservationDto, user: User) {
