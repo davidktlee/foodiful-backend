@@ -11,7 +11,9 @@ export class UserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUser(): Promise<User[]> {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      include: { account: true },
+    });
   }
   async getUserById(id: number) {
     return this.prisma.user.findUnique({
@@ -112,6 +114,13 @@ export class UserRepository {
     return this.prisma.user.findUnique({
       where: { id },
       include: { reservations: true },
+    });
+  }
+
+  async getUserProductReviews(id: number) {
+    return this.prisma.user.findMany({
+      where: { id },
+      include: { productReviews: true },
     });
   }
 }

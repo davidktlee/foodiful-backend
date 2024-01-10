@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,6 +22,9 @@ import {
 } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -33,21 +37,31 @@ export class UserController {
   @Get()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   @ApiForbiddenResponse({ type: ForbiddenException, description: 'Forbidden' })
-  async getUsers(): Promise<{ users: User[] }> {
-    return this.userService.getUsers();
+  async getUsers() {
+    const users = await this.userService.getUsers();
+    return users.map((user) => {
+      const { password, ...rest } = user;
+      return rest;
+    });
   }
-  @Get('/order/:id')
-  getOrderByUserId(@Param('id', ParseIntPipe) userId: number) {
-    return this.userService.getOrderByUserId(userId);
+
+  @Get('/product-review')
+  @UseGuards(JwtGuard)
+  getUserProductReviews(@GetUser() user: User) {
+    this.userService.getUserProductReviews(user.id);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
-  getUserById(@Param('id', ParseIntPipe) id: User['id']): Promise<User> {
-    return this.userService.getUserById(id);
+  async getUserById(@Param('id', ParseIntPipe) id: User['id']) {
+    const user = await this.userService.getUserById(id);
+    const { password, ...rest } = user;
+    return rest;
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @ApiOkResponse({
     type: UserEntity,
   })

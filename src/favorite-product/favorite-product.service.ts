@@ -18,11 +18,12 @@ export class FavoriteProductService {
     try {
       const favoriteProducts =
         await this.favoriteProductRepository.getFavoriteProductByUserId(userId);
-      if (favoriteProducts.length < 0)
+
+      if (!favoriteProducts.length) {
         throw new NotFoundException('좋아요 한 상품이 없습니다.');
-      else favoriteProducts.map((products) => products.product);
-    } catch {
-      throw new InternalServerErrorException('서버에서 에러 발생');
+      } else return favoriteProducts.map((products) => products.product);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 

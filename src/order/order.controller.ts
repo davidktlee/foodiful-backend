@@ -29,16 +29,17 @@ export class OrderController {
   }
 
   @Get()
-  findAll() {
-    return this.orderService.findAll();
+  getOrdersByUserId(@GetUser() user: User) {
+    return this.orderService.getOrdersByUserId(user.id);
   }
 
-  @Patch(':id')
+  @Patch(':orderId')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+    @Param('orderId') orderId: string,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
-    return this.orderService.update(id, updateOrderDto);
+    return this.orderService.update(user.id, orderId, updateOrderDto);
   }
 
   @Delete(':id')

@@ -17,13 +17,13 @@ export class OrderService {
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: User['id']) {
-    // orderForm과 orderProduct를 받아서 orderProduct는 orderProductService map돌려서 호출
-    // orderProduct는 orderId에 종속되기 때문에 order이 생긴 후에 생성
-    const { orderForm, orderProduct } = createOrderDto;
+    try {
+      const { orderForm, orderProduct } = createOrderDto;
 
-    const createdOrder = await this.orderRepository.create(orderForm, userId);
+      const createdOrder = await this.orderRepository.create(orderForm, userId);
+      if (!createdOrder)
+        throw new InternalServerErrorException('주문 생성 에러');
 
-    if (createdOrder) {
       const createdOrderProduct = orderProduct.map(
         ({ quantity, additionalCount, product }) => {
           this.orderProductService.create({
@@ -43,8 +43,8 @@ export class OrderService {
           createdOrderProduct,
         };
       }
-    } else {
-      throw new InternalServerErrorException('서버에서 에러가 났습니다');
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -56,14 +56,29 @@ export class OrderService {
     return `This action returns a #${id} order`;
   }
 
-  async getOrderByUserId(id: number) {
-    const orders = await this.orderRepository.getOrderByUserId(id);
-    if (orders.length < 0) throw new NotFoundException('주문 내역이 없습니다');
-    return orders;
+  async getOrdersByUserId(userId: number) {
+    try {
+      const order = await this.orderRepository.getOrderByUserId(userId);
+      if (!order.length)
+        throw new NotFoundException('주문이 존재하지 않습니다');
+      return order;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  async update(
+    userId: number,
+    orderId: string,
+    updateOrderDto: UpdateOrderDto,
+  ) {
+    try {
+      const order = await this.orderRepository.getOrderByUserId(userId);
+      console.log(order);
+      if (!order.length) throw new NotFoundException('존재하는 주문 없음');
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   remove(id: number) {

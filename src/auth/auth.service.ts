@@ -97,7 +97,6 @@ export class AuthService {
   }
 
   async checkSMS({ phoneNumber, verifyCode }) {
-    console.log(typeof verifyCode);
     const cacheVerifyNum = await this.cacheManager.get(phoneNumber);
     if (!cacheVerifyNum) {
       throw new UnauthorizedException('인증 번호가 만료되었습니다');
@@ -116,9 +115,6 @@ export class AuthService {
 
   async signUp(userData: CreateUserDto) {
     try {
-      const isExistPhone = await this.userRepository.checkPhone(userData.phone);
-      if (isExistPhone)
-        throw new ConflictException('이미 존재하는 휴대폰 번호입니다.');
       const hashedPassword = await this.transform(userData.password);
       const { email, name, phone } = await this.userRepository.createUser({
         ...userData,
@@ -126,7 +122,7 @@ export class AuthService {
       });
       return { email, name, phone };
     } catch (error) {
-      throw new ConflictException('이미 존재하는 유저입니다');
+      throw new ConflictException(error.message);
     }
   }
 

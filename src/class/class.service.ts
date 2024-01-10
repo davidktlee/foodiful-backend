@@ -43,7 +43,7 @@ export class ClassService {
         return classesWithLiked;
       }
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 

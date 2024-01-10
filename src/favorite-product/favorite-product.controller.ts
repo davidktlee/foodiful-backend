@@ -33,14 +33,18 @@ export class FavoriteProductController {
     return this.favoriteProductService.create(user.id, data.productId);
   }
 
-  @Get('/:userid')
-  getFavoriteProductByUserId(@Param('userid', ParseIntPipe) userId: number) {
-    return this.favoriteProductService.getFavoriteProductByUserId(userId);
+  @Get()
+  @UseGuards(JwtGuard)
+  getFavoriteProductByUserId(@GetUser() user: User) {
+    return this.favoriteProductService.getFavoriteProductByUserId(user.id);
   }
 
   @UseGuards(JwtGuard)
-  @Delete(':id')
-  remove(@GetUser() user: User, @Param('id', ParseIntPipe) productId: number) {
+  @Delete(':productId')
+  remove(
+    @GetUser() user: User,
+    @Param('productId', ParseIntPipe) productId: number,
+  ) {
     return this.favoriteProductService.remove(user.id, productId);
   }
 }

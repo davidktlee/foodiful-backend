@@ -38,7 +38,7 @@ export class CartService {
         );
       }
     } catch (error) {
-      throw new InternalServerErrorException('서버 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -56,7 +56,7 @@ export class CartService {
     try {
       return this.productOnCartRepository.getProductOnCart(cartId);
     } catch (error) {
-      throw new InternalServerErrorException('서버 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 

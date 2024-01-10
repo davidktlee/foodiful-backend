@@ -42,7 +42,7 @@ export class AwsService {
         }),
       );
     } catch (error) {
-      throw new InternalServerErrorException('서버에 문제가 있습니다.');
+      throw new InternalServerErrorException(error.message);
     }
 
     /**

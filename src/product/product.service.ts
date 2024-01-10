@@ -49,7 +49,7 @@ export class ProductService {
         return products;
       }
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -82,7 +82,7 @@ export class ProductService {
       if (!products) throw new NotFoundException('찾으시는 상품이 없습니다');
       return products;
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -92,7 +92,7 @@ export class ProductService {
       if (!product) throw new NotFoundException('찾으시는 상품이 없습니다');
       return product;
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -138,7 +138,7 @@ export class ProductService {
       if (product) throw new ConflictException('이미 존재하는 상품입니다');
       return this.productRepository.addProduct(productData);
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -157,7 +157,7 @@ export class ProductService {
       }
       return this.productRepository.updateProduct(id, updateProductData);
     } catch (error) {
-      throw new InternalServerErrorException('서버에서 알 수 없는 에러 발생');
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

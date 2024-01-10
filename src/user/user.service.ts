@@ -12,6 +12,8 @@ import { UserRepository } from './user.repository';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { OrderRepository } from 'src/order/order.repository';
+import { ProductReviewService } from 'src/product-review/product-review.service';
+import { ProductReviewRepository } from 'src/product-review/product-review.repository';
 
 @Injectable()
 export class UserService {
@@ -19,21 +21,23 @@ export class UserService {
     private userRepository: UserRepository,
     private readonly orderRepository: OrderRepository,
     private readonly config: ConfigService,
+    private productReviewService: ProductReviewService,
   ) {}
 
   /**
    *
    * @Todo: auth 기능 만든 후 getUsers, getUserById 기능은 관리자 일때만 가능하도록 만들기
    */
-  async getUsers(): Promise<{ users: User[] }> {
+  async getUsers(): Promise<User[]> {
     try {
       const users = await this.userRepository.getUser();
       if (users.length === 0) throw new ForbiddenException('회원이 없습니다');
-      return { users: users };
+      return users;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
   }
+
   async getUserById(id: number): Promise<User> {
     try {
       const user = await this.userRepository.getUserById(id);
@@ -119,15 +123,14 @@ export class UserService {
     }
   }
 
-  getReservationByUserId(userId: number) {
-    return this.userRepository.getReservationByUserId(userId);
-  }
-
-  async getOrderByUserId(id: number) {
+  async getUserProductReviews(userId: number) {
     try {
-      const user = await this.userRepository.getUserById(id);
-      if (!user) throw new NotFoundException('유저가 존재하지 않습니다.');
-      return this.orderRepository.getOrderByUserId(id);
+      const productReviews =
+        await this.productReviewService.getUserProductReviews(userId);
+      console.log(productReviews);
+      if (!productReviews.length)
+        throw new NotFoundException('상품 리뷰 존재하지 않음');
+      return productReviews;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }

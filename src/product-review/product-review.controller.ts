@@ -26,28 +26,28 @@ export class ProductReviewController {
     );
   }
 
-  @Get(':id')
+  @Get(':productId')
   getAllProductReviewsByProductId(
-    @Param('id', ParseIntPipe) productId: number,
+    @Param('productId', ParseIntPipe) productId: number,
   ) {
     return this.productReviewService.getAllProductReviewsByProductId(productId);
   }
 
-  @Patch(':id')
+  @Patch(':reviewId')
   @UseGuards(JwtGuard)
   updateProductReview(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('reviewId', ParseIntPipe) reviewId: number,
     @Body() updateProductReviewDto: UpdateProductReviewDto,
   ) {
     return this.productReviewService.updateProductReview(
-      id,
+      reviewId,
       updateProductReviewDto,
     );
   }
 
-  @Delete(':id')
+  @Delete(':reviewId')
   @UseGuards(JwtGuard)
-  deleteProductReview(@Param('id', ParseIntPipe) id: number) {
-    return this.productReviewService.deleteProductReview(id);
+  deleteProductReview(@Param('reviewId', ParseIntPipe) reviewId: number) {
+    return this.productReviewService.deleteProductReview(reviewId);
   }
 }

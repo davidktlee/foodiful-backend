@@ -30,49 +30,52 @@ export class ProductReviewService {
         createProductReviewDto,
       );
     } catch (error) {
-      throw new InternalServerErrorException('서버 에러입니다.');
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   async getAllProductReviewsByProductId(productId: number) {
-    try {
-      const productReviews =
-        await this.productReviewRepository.getAllProductReviews(productId);
-      if (productReviews.length < 0)
-        throw new NotFoundException('리뷰가 없습니다.');
-      return productReviews;
-    } catch (error) {
-      throw new InternalServerErrorException('서버 에러입니다.');
-    }
+    const productReviews =
+      await this.productReviewRepository.getAllProductReviews(productId);
+    if (productReviews.length < 1)
+      throw new NotFoundException('리뷰가 없습니다.');
+    return productReviews;
   }
 
   updateProductReview(
-    id: number,
+    reviewId: number,
     updateProductReviewDto: UpdateProductReviewDto,
   ) {
-    try {
-      const productReview =
-        this.productReviewRepository.getProductReviewById(id);
-      if (!productReview)
-        throw new NotFoundException('찾으시는 상품 리뷰가 없습니다.');
-      this.productReviewRepository.updateProductReview(
-        id,
-        updateProductReviewDto,
-      );
-    } catch (error) {
-      throw new InternalServerErrorException('서버 에러가 있습니다.');
-    }
+    const productReview =
+      this.productReviewRepository.getProductReviewById(reviewId);
+    if (!productReview)
+      throw new NotFoundException('찾으시는 상품 리뷰가 없습니다.');
+    return this.productReviewRepository.updateProductReview(
+      reviewId,
+      updateProductReviewDto,
+    );
   }
 
-  deleteProductReview(id: number) {
+  async deleteProductReview(id: number) {
     try {
       const productReview =
-        this.productReviewRepository.getProductReviewById(id);
+        await this.productReviewRepository.getProductReviewById(id);
       if (!productReview)
         throw new NotFoundException('삭제하실 리뷰가 없습니다');
       return this.productReviewRepository.deleteProductReview(id);
     } catch (error) {
-      throw new InternalServerErrorException('서버에러 입니다.');
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getUserProductReviews(userId: number) {
+    try {
+      const productReviews =
+        await this.productReviewRepository.getUserProductReviews(userId);
+      if (!productReviews) throw new NotFoundException('존재하는 리뷰 없음');
+      return productReviews;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

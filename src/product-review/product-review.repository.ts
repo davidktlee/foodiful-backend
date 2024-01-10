@@ -39,4 +39,9 @@ export class ProductReviewRepository {
       where: { id },
     });
   }
+  getUserProductReviews(userId: number) {
+    return this.prisma.productReview.findMany({
+      where: { userId },
+    });
+  }
 }
