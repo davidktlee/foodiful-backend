@@ -7,9 +7,7 @@ import { OrderProductRepository } from './order-product.repository';
 export class OrderProductService {
   constructor(private orderProductRepository: OrderProductRepository) {}
   async create(createOrderProductDto: CreateOrderProductDto) {
-    console.log(createOrderProductDto);
-    const res = await this.orderProductRepository.create(createOrderProductDto);
-    console.log(res);
+    await this.orderProductRepository.create(createOrderProductDto);
   }
 
   findAll() {

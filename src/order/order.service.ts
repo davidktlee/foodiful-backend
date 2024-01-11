@@ -22,25 +22,19 @@ export class OrderService {
     const createdOrder = await this.orderRepository.create(orderForm, userId);
     if (!createdOrder) throw new InternalServerErrorException('주문 생성 에러');
 
-    const createdOrderProduct = orderProduct.map(
-      ({ quantity, additionalCount, product }) => {
-        this.orderProductService.create({
-          orderId: createdOrder.id,
-          orderCount: quantity,
-          orderPrice: product.discount
-            ? this.getDiscountedPrice(product.price, product.discount)
-            : product.price,
-          productId: product.id,
-          additionalCount,
-        });
-      },
-    );
-    if (createdOrderProduct) {
-      return {
-        createdOrder,
-        createdOrderProduct,
-      };
-    }
+    orderProduct.forEach(({ quantity, additionalCount, product }) => {
+      this.orderProductService.create({
+        orderId: createdOrder.id,
+        orderCount: quantity,
+        orderPrice: product.discount
+          ? this.getDiscountedPrice(product.price, product.discount)
+          : product.price,
+        productId: product.id,
+        additionalCount,
+      });
+    });
+
+    return createdOrder;
   }
 
   findAll() {

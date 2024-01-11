@@ -18,7 +18,11 @@ export class OrderRepository {
   getOrderByUserId(userId: number) {
     return this.prisma.order.findMany({
       where: { userId },
-      include: { orderProduct: true },
+      include: {
+        orderProduct: {
+          include: { product: true },
+        },
+      },
     });
   }
 }

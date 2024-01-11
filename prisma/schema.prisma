@@ -19,7 +19,7 @@ model User {
   role            UserRole          @default(PUBLIC)
   account         Account?
   board           Board?
-  Cart            Cart?
+  Cart            Cart[]
   classReviews    ClassReview[]
   favoriteClass   FavoriteClass?
   favoriteProduct FavoriteProduct[]
@@ -70,7 +70,7 @@ model Product {
   limitQuantity   Int               @default(0)
   favoriteProduct FavoriteProduct[]
   orderProduct    OrderProduct[]
-  carts           ProductOnCart[]
+  carts           Cart[]
   reviews         ProductReview[]
 }
 
@@ -87,7 +87,7 @@ model Order {
   orderDate              DateTime       @default(now())
   quantity               Int
   userId                 Int
-  id                     String            @id
+  id                     String         @id
   deliverAddress         String
   deliverName            String
   requirement            String?
@@ -95,7 +95,7 @@ model Order {
   deliverPhone           String
   orderStatus            OrderStatus    @default(PROCEEDING)
   deliverSpecificAddress String
-  postalCode String
+  postalCode             String
   user                   User           @relation(fields: [userId], references: [id])
   orderProduct           OrderProduct[]
 }
@@ -179,23 +179,15 @@ model Message {
 }
 
 model Cart {
-  id            Int             @id @default(autoincrement())
-  userId        Int             @unique
-  User          User            @relation(fields: [userId], references: [id])
-  productOnCart ProductOnCart[]
-
-  @@index([userId])
-}
-
-model ProductOnCart {
-  cartId          Int
-  productId       Int
+  id              Int     @id @default(autoincrement())
+  userId          Int
   quantity        Int
   additionalCount Int
-  cart            Cart    @relation(fields: [cartId], references: [id])
+  productId       Int
   product         Product @relation(fields: [productId], references: [id])
+  User            User    @relation(fields: [userId], references: [id])
 
-  @@id([cartId, productId])
+  @@index([userId])
 }
 
 enum UserRole {
