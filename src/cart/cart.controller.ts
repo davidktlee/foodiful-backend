@@ -22,11 +22,8 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   /**
-   * @TODO: 상품 추가 시
-상품 id, 상품 개수, 추가 상품 개수, user id, 를 받는다.
+   * @TODO: 상품 추가 시 cart 새로 생성 및 상품id와 개수 추가
 
-userid로 카트 조회 후 카트가 이미 있다면 productOnCart의 cart id를 넣고 상품id와 상품 개수, 추가 상품 개수를 넣는다. 
-없다면 카트 생성 후 그 카트 id에 위 데이터를 똑같이 넣는다.
    */
   @Post()
   create(@GetUser() user: User, @Body() createCartDto: CreateCartDto) {
@@ -38,25 +35,21 @@ userid로 카트 조회 후 카트가 이미 있다면 productOnCart의 cart id�
     return this.cartService.getCartByUserId(user.id);
   }
 
-  @Patch(':cartid/:productid')
+  @Patch(':cartId')
   updateCart(
-    @Param('cartid', ParseIntPipe) cartId: number,
-    @Param('productid', ParseIntPipe) productId: number,
+    @Param('cartId', ParseIntPipe) cartId: number,
     @Body() updateCartDto: UpdateCartDto,
   ) {
-    return this.cartService.updateCart(cartId, productId, updateCartDto);
+    return this.cartService.updateCart(cartId, updateCartDto);
   }
 
-  @Delete(':cartid/:productid')
-  deleteCartItem(
-    @Param('cartid', ParseIntPipe) cartId: number,
-    @Param('productid', ParseIntPipe) productId: number,
-  ) {
-    return this.cartService.deleteCartItem(cartId, productId);
+  @Delete(':cartId')
+  deleteCartItem(@Param('cartId', ParseIntPipe) cartId: number) {
+    return this.cartService.deleteCartItem(cartId);
   }
 
-  @Delete('/all/:cartid')
-  deleteAllItems(@Param('cartid', ParseIntPipe) cartId: number) {
-    return this.cartService.deleteAllItems(cartId);
+  @Delete('/all')
+  deleteAllItems(@GetUser() user: User) {
+    return this.cartService.deleteAllItems(user.id);
   }
 }
