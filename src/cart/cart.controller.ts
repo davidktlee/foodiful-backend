@@ -43,13 +43,12 @@ export class CartController {
     return this.cartService.updateCart(cartId, updateCartDto);
   }
 
-  @Delete(':cartId')
-  deleteCartItem(@Param('cartId', ParseIntPipe) cartId: number) {
-    return this.cartService.deleteCartItem(cartId);
-  }
-
   @Delete('/all')
   deleteAllItems(@GetUser() user: User) {
     return this.cartService.deleteAllItems(user.id);
+  }
+  @Delete(':cartId')
+  deleteCartItem(@Param('cartId', ParseIntPipe) cartId: number) {
+    return this.cartService.deleteCartItem(cartId);
   }
 }

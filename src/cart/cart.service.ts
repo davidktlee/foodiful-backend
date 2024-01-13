@@ -28,6 +28,11 @@ export class CartService {
     return this.cartRepository.deleteCart(cartId);
   }
 
+  deleteCartItemByProductId(productId: number) {
+    console.log(productId);
+    return this.cartRepository.deleteCartItemByProductId(productId);
+  }
+
   deleteAllItems(userId: number) {
     return this.cartRepository.deleteAllProductOnCart(userId);
   }

@@ -33,6 +33,14 @@ export class CartRepository {
     });
   }
 
+  deleteCartItemByProductId(productId: number) {
+    return this.prisma.cart.delete({
+      where: {
+        productId,
+      },
+    });
+  }
+
   deleteAllProductOnCart(userId: number) {
     return this.prisma.cart.deleteMany({
       where: { userId },
