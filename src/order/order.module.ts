@@ -5,6 +5,8 @@ import { OrderRepository } from './order.repository';
 import { PrismaService } from 'src/prisma.service';
 import { OrderProductService } from 'src/order-product/order-product.service';
 import { OrderProductRepository } from 'src/order-product/order-product.repository';
+import { CartService } from 'src/cart/cart.service';
+import { CartRepository } from 'src/cart/cart.repository';
 
 @Module({
   controllers: [OrderController],
@@ -14,6 +16,8 @@ import { OrderProductRepository } from 'src/order-product/order-product.reposito
     OrderRepository,
     OrderProductRepository,
     PrismaService,
+    CartService,
+    CartRepository,
   ],
 })
 export class OrderModule {}

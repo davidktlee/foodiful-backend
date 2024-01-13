@@ -10,7 +10,7 @@ import { FavoriteProductRepository } from './favorite-product.repository';
 @Injectable()
 export class FavoriteProductService {
   constructor(private favoriteProductRepository: FavoriteProductRepository) {}
-  create(userId: number, productId: number) {
+  create(userId: number, productId: CreateFavoriteProductDto['productId']) {
     return this.favoriteProductRepository.create(userId, productId);
   }
 
@@ -20,7 +20,8 @@ export class FavoriteProductService {
 
     if (!favoriteProducts.length) {
       throw new NotFoundException('좋아요 한 상품이 없습니다.');
-    } else return favoriteProducts.map((products) => products.product);
+    }
+    return favoriteProducts.map((products) => products.product);
   }
 
   findOne(id: number) {

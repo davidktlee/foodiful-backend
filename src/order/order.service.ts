@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { CartService } from 'src/cart/cart.service';
 import { OrderProductService } from 'src/order-product/order-product.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -14,6 +15,7 @@ export class OrderService {
   constructor(
     private orderRepository: OrderRepository,
     private orderProductService: OrderProductService,
+    private cartService: CartService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: User['id']) {
@@ -22,7 +24,7 @@ export class OrderService {
     const createdOrder = await this.orderRepository.create(orderForm, userId);
     if (!createdOrder) throw new InternalServerErrorException('주문 생성 에러');
 
-    orderProduct.forEach(({ quantity, additionalCount, product }) => {
+    orderProduct.forEach(async ({ quantity, additionalCount, product }) => {
       this.orderProductService.create({
         orderId: createdOrder.id,
         orderCount: quantity,
@@ -32,6 +34,7 @@ export class OrderService {
         productId: product.id,
         additionalCount,
       });
+      await this.cartService.deleteCartItemByProductId(product.id);
     });
 
     return createdOrder;
@@ -61,8 +64,8 @@ export class OrderService {
     if (!order.length) throw new NotFoundException('존재하는 주문 없음');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  remove(id: string) {
+    return `This action removes a #$ order`;
   }
 
   getDiscountedPrice = (price: number, discount: number) => {
