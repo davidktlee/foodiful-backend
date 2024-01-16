@@ -1,15 +1,12 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
-import { UpdateFavoriteProductDto } from './dto/update-favorite-product.dto';
 import { FavoriteProductRepository } from './favorite-product.repository';
 
 @Injectable()
 export class FavoriteProductService {
-  constructor(private favoriteProductRepository: FavoriteProductRepository) {}
+  constructor(
+    private favoriteProductRepository: FavoriteProductRepository, // private productService: ProductService,
+  ) {}
   create(userId: number, productId: CreateFavoriteProductDto['productId']) {
     return this.favoriteProductRepository.create(userId, productId);
   }
@@ -21,15 +18,10 @@ export class FavoriteProductService {
     if (!favoriteProducts.length) {
       throw new NotFoundException('좋아요 한 상품이 없습니다.');
     }
-    return favoriteProducts.map((products) => products.product);
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} favoriteProduct`;
-  }
-
-  update(id: number, updateFavoriteProductDto: UpdateFavoriteProductDto) {
-    return `This action updates a #${id} favoriteProduct`;
+    return favoriteProducts.map((products) => ({
+      ...products.product,
+      isLiked: true,
+    }));
   }
 
   remove(userId: number, productId: number) {

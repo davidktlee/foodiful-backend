@@ -25,4 +25,10 @@ export class OrderRepository {
       },
     });
   }
+
+  delete(id: string) {
+    return this.prisma.order.delete({
+      where: { id },
+    });
+  }
 }

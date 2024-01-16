@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import dayjs from 'dayjs';
 import { ClassRepository } from 'src/class/class.repository';
@@ -20,8 +16,6 @@ export class ReservationService {
 
   async getAllReservations() {
     const reservations = await this.reservationRepository.getAllReservations();
-    if (!reservations.length)
-      throw new NotFoundException('예약이 존재하지 않습니다');
     return reservations;
   }
 

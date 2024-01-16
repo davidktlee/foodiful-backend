@@ -17,6 +17,11 @@ export class CartRepository {
       include: { product: true },
     });
   }
+  getCartByProductId(productId: number) {
+    return this.prisma.cart.findUnique({
+      where: { productId },
+    });
+  }
 
   updateCart(cartId: number, updateCartDto: UpdateCartDto) {
     return this.prisma.cart.update({

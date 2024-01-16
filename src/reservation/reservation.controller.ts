@@ -5,13 +5,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiProperty, ApiResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { CloudFormation } from 'aws-sdk';
-import { Request } from 'express';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { CreateReservationDto } from './dto/create-reservation.dto';

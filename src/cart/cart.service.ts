@@ -20,6 +20,10 @@ export class CartService {
     return cart;
   }
 
+  getCartByProductId(productId: number) {
+    return this.cartRepository.getCartByProductId(productId);
+  }
+
   updateCart(cartId: number, updateCartDto: UpdateCartDto) {
     return this.cartRepository.updateCart(cartId, updateCartDto);
   }

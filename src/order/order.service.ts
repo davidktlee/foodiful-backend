@@ -34,7 +34,9 @@ export class OrderService {
         productId: product.id,
         additionalCount,
       });
-      await this.cartService.deleteCartItemByProductId(product.id);
+      // 카트에 아이템 없이 바로 구매할 수도 있기 때문에 카트에 product가 있을 때만 삭제
+      const carts = await this.cartService.getCartByProductId(product.id);
+      if (carts) await this.cartService.deleteCartItemByProductId(product.id);
     });
 
     return createdOrder;
@@ -65,7 +67,7 @@ export class OrderService {
   }
 
   remove(id: string) {
-    return `This action removes a #$ order`;
+    return this.orderRepository.delete(id);
   }
 
   getDiscountedPrice = (price: number, discount: number) => {
