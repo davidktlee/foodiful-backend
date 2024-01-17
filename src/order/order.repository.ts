@@ -26,9 +26,10 @@ export class OrderRepository {
     });
   }
 
-  delete(id: string) {
-    return this.prisma.order.delete({
+  cancelOrder(id: string) {
+    return this.prisma.order.update({
       where: { id },
+      data: { orderStatus: 'CANCEL' },
     });
   }
 }

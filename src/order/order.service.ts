@@ -66,8 +66,8 @@ export class OrderService {
     if (!order.length) throw new NotFoundException('존재하는 주문 없음');
   }
 
-  remove(id: string) {
-    return this.orderRepository.delete(id);
+  async cancelOrder(id: string) {
+    return this.orderRepository.cancelOrder(id);
   }
 
   getDiscountedPrice = (price: number, discount: number) => {

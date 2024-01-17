@@ -32,6 +32,10 @@ export class OrderController {
   getOrdersByUserId(@GetUser() user: User) {
     return this.orderService.getOrdersByUserId(user.id);
   }
+  @Patch('/cancel/:id')
+  cancelOrder(@Param('id') id: string) {
+    return this.orderService.cancelOrder(id);
+  }
 
   @Patch(':orderId')
   update(
@@ -40,10 +44,5 @@ export class OrderController {
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     return this.orderService.update(user.id, orderId, updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(id);
   }
 }
