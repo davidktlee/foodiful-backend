@@ -1,216 +1,3 @@
-// generator client {
-//   provider = "prisma-client-js"
-// }
-
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
-// model User {
-//   name            String
-//   phone           String            @unique
-//   password        String
-//   createdAt       DateTime          @default(now())
-//   email           String            @unique
-//   id              Int               @id @default(autoincrement())
-//   updatedAt       DateTime?
-//   deleted         Boolean           @default(false)
-//   role            UserRole          @default(PUBLIC)
-//   account         Account?
-//   board           Board?
-//   Cart            Cart?
-//   classReviews    ClassReview[]
-//   favoriteClass   FavoriteClass?
-//   favoriteProduct FavoriteProduct[]
-//   message         Message[]
-//   order           Order[]
-//   productReviews  ProductReview[]
-//   reservations    Reservation[]
-// }
-
-// model Account {
-//   refreshToken String
-//   loginAt      DateTime @default(now())
-//   userId       Int      @unique
-//   address      String[]
-//   user         User     @relation(fields: [userId], references: [id])
-// }
-
-// model Class {
-//   name          String          @unique
-//   price         Int
-//   discount      Int             @default(0)
-//   description   String
-//   classDuration Int
-//   descImg       String[]
-//   id            Int             @id @default(autoincrement())
-//   reviews       ClassReview[]
-//   favoriteClass FavoriteClass[]
-//   reservation   Reservation[]
-// }
-
-// model FavoriteClass {
-//   userId  Int   @unique
-//   classId Int
-//   class   Class @relation(fields: [classId], references: [id])
-//   user    User  @relation(fields: [userId], references: [id])
-// }
-
-// model Product {
-//   name            String            @unique
-//   price           Int
-//   discount        Int
-//   description     String
-//   descImg         String[]
-//   deliver         Boolean
-//   categories      String[]
-//   id              Int               @id @default(autoincrement())
-//   subTitle        String
-//   limitQuantity   Int               @default(0)
-//   favoriteProduct FavoriteProduct[]
-//   orderProduct    OrderProduct[]
-//   ProductOnCart   ProductOnCart[]
-//   reviews         ProductReview[]
-// }
-
-// model FavoriteProduct {
-//   userId    Int
-//   productId Int
-//   product   Product @relation(fields: [productId], references: [id])
-//   user      User    @relation(fields: [userId], references: [id])
-
-//   @@id([userId, productId])
-// }
-
-// model Order {
-//   orderDate              DateTime       @default(now())
-//   quantity               Int
-//   userId                 Int
-//   id                     String         @id @default(dbgenerated("nextval('\"Order_id_seq\"'::regclass)"))
-//   deliverAddress         String
-//   deliverName            String
-//   requirement            String?
-//   totalPrice             Int
-//   deliverPhone           String
-//   deliverSpecificAddress String
-//   orderStatus            OrderStatus    @default(PROCEEDING)
-//   postalCode             String
-//   user                   User           @relation(fields: [userId], references: [id])
-//   orderProduct           OrderProduct[]
-// }
-
-// model OrderProduct {
-//   id              Int     @id @default(autoincrement())
-//   orderCount      Int
-//   orderPrice      Int
-//   productId       Int
-//   orderId         String
-//   additionalCount Int
-//   order           Order   @relation(fields: [orderId], references: [id])
-//   product         Product @relation(fields: [productId], references: [id])
-// }
-
-// model Reservation {
-//   userId      Int
-//   classId     Int
-//   id          Int      @id @default(autoincrement())
-//   deleted     Boolean  @default(false)
-//   reserveDate String[]
-//   class       Class    @relation(fields: [classId], references: [id])
-//   user        User     @relation(fields: [userId], references: [id])
-// }
-
-// model ProductReview {
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   comment   String
-//   userId    Int
-//   productId Int
-//   id        Int      @id @default(autoincrement())
-//   deleted   Boolean  @default(false)
-//   rating    Int
-//   reviewImg String?
-//   product   Product  @relation(fields: [productId], references: [id])
-//   user      User     @relation(fields: [userId], references: [id])
-
-//   @@index([productId, userId])
-// }
-
-// model ClassReview {
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   comment   String
-//   rating    Float
-//   userId    Int
-//   classId   Int
-//   id        Int      @id @default(autoincrement())
-//   deleted   Boolean  @default(false)
-//   reviewImg String[]
-//   class     Class    @relation(fields: [classId], references: [id])
-//   user      User     @relation(fields: [userId], references: [id])
-// }
-
-// model Board {
-//   id          Int      @id @default(autoincrement())
-//   title       String
-//   type        String
-//   content     String
-//   publishedAt DateTime @default(now())
-//   authorId    Int      @unique
-//   author      User     @relation(fields: [authorId], references: [id])
-// }
-
-// model Conversation {
-//   id        Int       @id @default(autoincrement())
-//   createdAt DateTime  @default(now())
-//   deleted   Boolean   @default(false)
-//   messages  Message[]
-// }
-
-// model Message {
-//   id             Int          @id @default(autoincrement())
-//   createdAt      DateTime     @default(now())
-//   text           String
-//   senderId       Int
-//   conversationId Int
-//   conversation   Conversation @relation(fields: [conversationId], references: [id])
-//   sender         User         @relation(fields: [senderId], references: [id])
-// }
-
-// model Cart {
-//   id            Int             @id @default(autoincrement())
-//   userId        Int             @unique
-//   User          User            @relation(fields: [userId], references: [id])
-//   ProductOnCart ProductOnCart[]
-
-//   @@index([userId])
-// }
-
-// model ProductOnCart {
-//   cartId          Int
-//   productId       Int
-//   quantity        Int
-//   additionalCount Int
-//   Cart            Cart    @relation(fields: [cartId], references: [id])
-//   Product         Product @relation(fields: [productId], references: [id])
-
-//   @@id([cartId, productId])
-// }
-
-// enum UserRole {
-//   PUBLIC
-//   ADMIN
-//   STRANGER
-// }
-
-// enum OrderStatus {
-//   PROCEEDING
-//   COMPLETE
-//   CANCEL
-//   SHIPPING
-// }
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -240,6 +27,7 @@ model User {
   order           Order[]
   productReviews  ProductReview[]
   reservations    Reservation[]
+  refund Refund?
 }
 
 model Account {
@@ -311,6 +99,7 @@ model Order {
   postalCode             String
   user                   User           @relation(fields: [userId], references: [id])
   orderProduct           OrderProduct[]
+  refund Refund?
 }
 
 model OrderProduct {
@@ -398,9 +187,17 @@ model Cart {
   additionalCount Int
   productId       Int     @unique
   product         Product @relation(fields: [productId], references: [id])
-  User            User    @relation(fields: [userId], references: [id])
+  user            User    @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model Refund {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  orderId String @unique
+  user User   @relation(fields: [userId], references: [id]) 
+  order Order @relation(fields: [orderId], references: [id]) 
 }
 
 enum UserRole {
