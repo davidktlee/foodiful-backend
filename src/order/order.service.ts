@@ -6,6 +6,7 @@ import {
 import { User } from '@prisma/client';
 import { CartService } from 'src/cart/cart.service';
 import { OrderProductService } from 'src/order-product/order-product.service';
+import { RefundService } from 'src/refund/refund.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderRepository } from './order.repository';
@@ -16,6 +17,7 @@ export class OrderService {
     private orderRepository: OrderRepository,
     private orderProductService: OrderProductService,
     private cartService: CartService,
+    private refundService: RefundService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto, userId: User['id']) {
@@ -66,8 +68,9 @@ export class OrderService {
     if (!order.length) throw new NotFoundException('존재하는 주문 없음');
   }
 
-  async cancelOrder(id: string) {
-    return this.orderRepository.cancelOrder(id);
+  async cancelOrder(orderId: string, cancelReason: string, userId: number) {
+    await this.refundService.create({ userId, orderId });
+    return this.orderRepository.cancelOrder(orderId);
   }
 
   getDiscountedPrice = (price: number, discount: number) => {

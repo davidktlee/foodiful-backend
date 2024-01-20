@@ -16,6 +16,7 @@ import { ProductReviewModule } from './product-review/product-review.module';
 import { FavoriteClassModule } from './favorite-class/favorite-class.module';
 import { FavoriteProductModule } from './favorite-product/favorite-product.module';
 import { CartModule } from './cart/cart.module';
+import { RefundModule } from './refund/refund.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CartModule } from './cart/cart.module';
     FavoriteProductModule,
     FavoriteClassModule,
     CartModule,
+    RefundModule,
   ],
   controllers: [AppController],
   providers: [

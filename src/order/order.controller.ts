@@ -33,8 +33,12 @@ export class OrderController {
     return this.orderService.getOrdersByUserId(user.id);
   }
   @Patch('/cancel/:id')
-  cancelOrder(@Param('id') id: string) {
-    return this.orderService.cancelOrder(id);
+  cancelOrder(
+    @Param('id') id: string,
+    @Body() cancelReason: string,
+    @GetUser() user: User,
+  ) {
+    return this.orderService.cancelOrder(id, cancelReason, user.id);
   }
 
   @Patch(':orderId')
