@@ -34,11 +34,6 @@ export class ReservationController {
   ) {
     return this.reservationService.createReservation(reservationData, user);
   }
-  @Get('/me')
-  @UseGuards(JwtGuard)
-  getReservationByUserId(@GetUser() user: User) {
-    return this.reservationService.getReservationByUserId(user.id);
-  }
 
   @Get(':id')
   getReservationByReservationId(@Param('id', ParseIntPipe) id: number) {

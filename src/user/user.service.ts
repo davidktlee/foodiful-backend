@@ -110,4 +110,9 @@ export class UserService {
       throw new NotFoundException('상품 리뷰 존재하지 않음');
     return productReviews;
   }
+
+  async getReservationByUserId(userId: number) {
+    const user = await this.userRepository.getReservationByUserId(userId);
+    if (user) return user.reservations;
+  }
 }

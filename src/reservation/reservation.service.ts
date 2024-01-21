@@ -26,10 +26,6 @@ export class ReservationService {
     return reservations;
   }
 
-  getReservationByUserId(userId: number) {
-    return this.reservationRepository.getReservationByUserId(userId);
-  }
-
   async createReservation(reservation: CreateReservationDto, user: User) {
     const { id } = await this.userRepository.getUserById(user.id);
 

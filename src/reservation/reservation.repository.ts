@@ -15,12 +15,6 @@ export class ReservationRepository {
     });
   }
 
-  getReservationByUserId(userId: number) {
-    return this.prisma.reservation.findMany({
-      where: { userId },
-    });
-  }
-
   getReservationByClassId(id: number) {
     return this.prisma.reservation.findMany({
       where: { classId: id },

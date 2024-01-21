@@ -51,6 +51,12 @@ export class UserController {
     this.userService.getUserProductReviews(user.id);
   }
 
+  @Get('/reservation/:userId')
+  @UseGuards(JwtGuard)
+  getReservationByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.getReservationByUserId(userId);
+  }
+
   @Get(':id')
   @ApiOkResponse({ type: UserEntity })
   async getUserById(@Param('id', ParseIntPipe) id: User['id']) {
