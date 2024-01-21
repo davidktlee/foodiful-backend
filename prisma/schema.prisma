@@ -194,6 +194,8 @@ model Cart {
 
 model Refund {
   id Int @id @default(autoincrement())
+  refundAt DateTime @default(now())
+  refundReason String
   userId Int @unique
   orderId String @unique
   user User   @relation(fields: [userId], references: [id]) 

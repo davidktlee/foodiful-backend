@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsString } from 'class-validator';
 
 export class CreateRefundDto {
   @IsNumber()
@@ -6,4 +6,7 @@ export class CreateRefundDto {
 
   @IsString()
   orderId: string;
+
+  @IsString()
+  refundReason: string;
 }
