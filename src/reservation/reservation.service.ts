@@ -26,11 +26,8 @@ export class ReservationService {
     return reservations;
   }
 
-  async getReservationByUserId(userId: number) {
-    const reservations =
-      await this.reservationRepository.getReservationByUserId(userId);
-    if (!reservations.length) throw new NotFoundException('예약 없음');
-    return reservations;
+  getReservationByUserId(userId: number) {
+    return this.reservationRepository.getReservationByUserId(userId);
   }
 
   async createReservation(reservation: CreateReservationDto, user: User) {

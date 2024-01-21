@@ -1,21 +1,11 @@
 import { S3 } from '@aws-sdk/client-s3';
 import {
-  BadRequestException,
-  CacheInterceptor,
-  CACHE_MANAGER,
   ConflictException,
-  ForbiddenException,
-  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { Cache } from 'cache-manager';
 import { AuthService } from 'src/auth/auth.service';
-import { UploadFilesDto } from 'src/aws/dto/uploadFile-dto';
 import { FavoriteProductRepository } from 'src/favorite-product/favorite-product.repository';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -29,7 +19,6 @@ export class ProductService {
     private favoriteProductRepository: FavoriteProductRepository,
     private authService: AuthService,
     private readonly config: ConfigService,
-    private jwtService: JwtService,
   ) {}
 
   async getProducts(token?: string): Promise<Product[]> {
@@ -42,8 +31,8 @@ export class ProductService {
       }
     } else {
       const products = await this.productRepository.getProducts();
-      if (products.length === 0) {
-        throw new ForbiddenException('상품이 없습니다');
+      if (!products.length) {
+        return [];
       }
       return products;
     }
@@ -51,9 +40,7 @@ export class ProductService {
 
   async getProductsWithUserLiked(userId: number) {
     const products = await this.productRepository.getProducts();
-    if (products.length === 0) {
-      throw new ForbiddenException('상품이 없습니다');
-    }
+    if (!products.length) return [];
 
     const productIdsWithLiked =
       await this.favoriteProductRepository.getLikedProductIds(userId);
@@ -79,16 +66,6 @@ export class ProductService {
     if (!product) throw new NotFoundException('찾으시는 상품이 없습니다');
     return product;
   }
-
-  // async uploadProductImg(files: Express.MulterS3.File[]) {
-  //   if (!files) {
-  //     throw new BadRequestException('파일을 업로드 해주세요.');
-  //   }
-  //   const locations = files.map((file) => {
-  //     return file.location;
-  //   });
-  //   return locations;
-  // }
 
   async deleteProductImg(
     id: number,

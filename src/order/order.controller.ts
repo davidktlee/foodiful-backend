@@ -35,10 +35,10 @@ export class OrderController {
   @Patch('/cancel/:id')
   cancelOrder(
     @Param('id') id: string,
-    @Body() cancelReason: string,
+    @Body() refundReason: string,
     @GetUser() user: User,
   ) {
-    return this.orderService.cancelOrder(id, cancelReason, user.id);
+    return this.orderService.cancelOrder(id, refundReason, user.id);
   }
 
   @Patch(':orderId')

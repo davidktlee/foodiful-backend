@@ -28,12 +28,8 @@ export class ProductReviewService {
     );
   }
 
-  async getAllProductReviewsByProductId(productId: number) {
-    const productReviews =
-      await this.productReviewRepository.getAllProductReviews(productId);
-    if (productReviews.length < 1)
-      throw new NotFoundException('리뷰가 없습니다.');
-    return productReviews;
+  getAllProductReviewsByProductId(productId: number) {
+    return this.productReviewRepository.getAllProductReviews(productId);
   }
 
   updateProductReview(
@@ -57,10 +53,7 @@ export class ProductReviewService {
     return this.productReviewRepository.deleteProductReview(id);
   }
 
-  async getUserProductReviews(userId: number) {
-    const productReviews =
-      await this.productReviewRepository.getUserProductReviews(userId);
-    if (!productReviews) throw new NotFoundException('존재하는 리뷰 없음');
-    return productReviews;
+  getUserProductReviews(userId: number) {
+    return this.productReviewRepository.getUserProductReviews(userId);
   }
 }

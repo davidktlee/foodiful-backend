@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { CartService } from 'src/cart/cart.service';
 import { OrderProductService } from 'src/order-product/order-product.service';
@@ -52,24 +48,16 @@ export class OrderService {
     return `This action returns a #${id} order`;
   }
 
-  async getOrdersByUserId(userId: number) {
-    const order = await this.orderRepository.getOrderByUserId(userId);
-    if (!order.length) throw new NotFoundException('주문이 존재하지 않습니다');
-    return order;
+  getOrdersByUserId(userId: number) {
+    return this.orderRepository.getOrderByUserId(userId);
   }
 
-  async update(
-    userId: number,
-    orderId: string,
-    updateOrderDto: UpdateOrderDto,
-  ) {
-    const order = await this.orderRepository.getOrderByUserId(userId);
-    console.log(order);
-    if (!order.length) throw new NotFoundException('존재하는 주문 없음');
+  update(userId: number, orderId: string, updateOrderDto: UpdateOrderDto) {
+    return this.orderRepository.getOrderByUserId(userId);
   }
 
-  async cancelOrder(orderId: string, cancelReason: string, userId: number) {
-    await this.refundService.create({ userId, orderId });
+  async cancelOrder(orderId: string, refundReason: string, userId: number) {
+    await this.refundService.create({ userId, orderId, refundReason });
     return this.orderRepository.cancelOrder(orderId);
   }
 

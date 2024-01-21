@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateFavoriteProductDto } from './dto/create-favorite-product.dto';
 import { FavoriteProductRepository } from './favorite-product.repository';
 
@@ -15,13 +15,12 @@ export class FavoriteProductService {
     const favoriteProducts =
       await this.favoriteProductRepository.getFavoriteProductByUserId(userId);
 
-    if (!favoriteProducts.length) {
-      throw new NotFoundException('좋아요 한 상품이 없습니다.');
-    }
-    return favoriteProducts.map((products) => ({
-      ...products.product,
-      isLiked: true,
-    }));
+    if (!!favoriteProducts.length) {
+      return favoriteProducts.map((products) => ({
+        ...products.product,
+        isLiked: true,
+      }));
+    } else return [];
   }
 
   remove(userId: number, productId: number) {
