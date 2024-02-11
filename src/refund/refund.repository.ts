@@ -6,8 +6,9 @@ import { CreateRefundDto } from './dto/create-refund.dto';
 export class RefundRepository {
   constructor(private prisma: PrismaService) {}
   createRefund(createRefundDto: CreateRefundDto) {
-    return this.prisma.refund.create({
-      data: { ...createRefundDto },
-    });
+    console.log(createRefundDto);
+    // return this.prisma.refund.create({
+    //   data: { ...createRefundDto },
+    // });
   }
 }
