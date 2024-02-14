@@ -117,10 +117,10 @@ export class UserRepository {
     });
   }
 
-  async getUserProductReviews(id: number) {
+  getRefundsByUserId(id: number) {
     return this.prisma.user.findMany({
       where: { id },
-      include: { productReviews: true },
+      include: { refund: true },
     });
   }
 }

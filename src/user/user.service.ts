@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { OrderRepository } from 'src/order/order.repository';
 import { ProductReviewService } from 'src/product-review/product-review.service';
 import { ProductReviewRepository } from 'src/product-review/product-review.repository';
+import { RefundRepository } from 'src/refund/refund.repository';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,7 @@ export class UserService {
     private readonly orderRepository: OrderRepository,
     private readonly config: ConfigService,
     private productReviewService: ProductReviewService,
+    private refundRepository: RefundRepository,
   ) {}
 
   /**
@@ -103,16 +105,20 @@ export class UserService {
   }
 
   async getUserProductReviews(userId: number) {
-    const productReviews =
-      await this.productReviewService.getUserProductReviews(userId);
-
-    if (!productReviews.length)
-      throw new NotFoundException('상품 리뷰 존재하지 않음');
-    return productReviews;
+    const review = await this.productReviewService.getUserProductReviews(
+      userId,
+    );
+    if (!review.length) return [];
+    else return review;
   }
 
   async getReservationByUserId(userId: number) {
     const user = await this.userRepository.getReservationByUserId(userId);
     if (user) return user.reservations;
+  }
+
+  async getRefundsByUserId(userId: number) {
+    const refunds = await this.refundRepository.getRefundsByUserId(userId);
+    return refunds;
   }
 }

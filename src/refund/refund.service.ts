@@ -10,12 +10,8 @@ export class RefundService {
     return this.refundRepository.createRefund(createRefundDto);
   }
 
-  findAll() {
-    return `This action returns all refund`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} refund`;
+  getAllRefunds() {
+    return this.refundRepository.getAllRefunds();
   }
 
   update(id: number, updateRefundDto: UpdateRefundDto) {

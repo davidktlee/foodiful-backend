@@ -9,4 +9,7 @@ export class CreateRefundDto {
 
   @IsString()
   refundReason: string;
+
+  @IsNumber()
+  totalPrice: number;
 }

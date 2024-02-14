@@ -27,7 +27,7 @@ model User {
   order           Order[]
   productReviews  ProductReview[]
   reservations    Reservation[]
-  refund Refund?
+  refund Refund[]
 }
 
 model Account {
@@ -99,7 +99,7 @@ model Order {
   postalCode             String
   user                   User           @relation(fields: [userId], references: [id])
   orderProduct           OrderProduct[]
-  refund Refund?
+  refund Refund[]
 }
 
 model OrderProduct {
@@ -196,10 +196,12 @@ model Refund {
   id Int @id @default(autoincrement())
   refundAt DateTime @default(now())
   refundReason String
-  userId Int @unique
+  userId Int
   orderId String @unique
+  totalPrice Int 
+  status RefundStatus @default(PROCEEDING)
   user User   @relation(fields: [userId], references: [id]) 
-  order Order @relation(fields: [orderId], references: [id]) 
+  order Order @relation(fields: [orderId], references: [id])
 }
 
 enum UserRole {
@@ -213,4 +215,9 @@ enum OrderStatus {
   SHIPPING
   COMPLETE
   CANCEL
+}
+
+enum RefundStatus {
+  PROCEEDING
+  COMPLETE
 }

@@ -26,6 +26,12 @@ export class OrderRepository {
     });
   }
 
+  getOrderByOrderId(orderId: string) {
+    return this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+  }
+
   cancelOrder(id: string) {
     return this.prisma.order.update({
       where: { id },

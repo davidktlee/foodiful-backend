@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { ProductReviewRepository } from 'src/product-review/product-review.repository';
 import { ProductReviewService } from 'src/product-review/product-review.service';
 import { ProductRepository } from 'src/product/product.repository';
+import { RefundRepository } from 'src/refund/refund.repository';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
@@ -20,6 +21,7 @@ import { UserService } from './user.service';
     ProductReviewRepository,
     ProductRepository,
     JwtService,
+    RefundRepository,
   ],
 })
 export class UserModule {}

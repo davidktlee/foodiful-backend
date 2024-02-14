@@ -45,10 +45,17 @@ export class UserController {
     });
   }
 
-  @Get('/product-review')
+  @Get('/refund/:userId')
   @UseGuards(JwtGuard)
-  getUserProductReviews(@GetUser() user: User) {
-    this.userService.getUserProductReviews(user.id);
+  getRefundsByUserId(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.getRefundsByUserId(userId);
+  }
+
+  // userId를 파라미터로 받은 이유: 리액트 쿼리에서 전체 리뷰와 각 유저에 대한 리뷰를 구분하기 위해서
+  @Get('/product-review/:userId')
+  @UseGuards(JwtGuard)
+  getUserProductReviews(@Param('userId', ParseIntPipe) userId: number) {
+    return this.userService.getUserProductReviews(userId);
   }
 
   @Get('/reservation/:userId')

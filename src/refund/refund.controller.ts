@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { RefundService } from './refund.service';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import { UpdateRefundDto } from './dto/update-refund.dto';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('refund')
 export class RefundController {
@@ -22,13 +24,8 @@ export class RefundController {
   }
 
   @Get()
-  findAll() {
-    return this.refundService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.refundService.findOne(id);
+  getAllRefunds() {
+    return this.refundService.getAllRefunds();
   }
 
   @Patch(':id')

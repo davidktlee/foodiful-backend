@@ -57,7 +57,15 @@ export class OrderService {
   }
 
   async cancelOrder(orderId: string, refundReason: string, userId: number) {
-    await this.refundService.create({ userId, orderId, refundReason });
+    const { totalPrice } = await this.orderRepository.getOrderByOrderId(
+      orderId,
+    );
+    await this.refundService.create({
+      userId,
+      orderId,
+      refundReason,
+      totalPrice,
+    });
     return this.orderRepository.cancelOrder(orderId);
   }
 
