@@ -18,7 +18,7 @@ export class RefundRepository {
   getRefundsByUserId(userId: number) {
     return this.prisma.$queryRaw`
       SELECT 
-        r."totalPrice", r."orderId", r."refundAt", r."refundReason",
+        r."totalPrice", r."orderId", r."refundAt", r."refundReason", r.status,
         json_agg(json_build_object('productId', p.id, 'additionalCount', op."additionalCount", 'descImg', p."descImg"[1], 'name', p.name, 'count', op."orderCount" )) AS products
       FROM 
         "Refund" r
@@ -31,7 +31,7 @@ export class RefundRepository {
       WHERE 
         r."userId" = ${userId}
       GROUP BY 
-        r."totalPrice", r."orderId", r."refundAt", r."refundReason"
+        r."totalPrice", r."orderId", r."refundAt", r."refundReason", r.status
     `;
   }
 }
