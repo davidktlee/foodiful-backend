@@ -8,19 +8,29 @@ import { FavoriteClassRepository } from 'src/favorite-class/favorite-class.repos
 import { ClassRepository } from './class.repository';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class ClassService {
   constructor(
     private classRepository: ClassRepository,
     private favoriteClassRepository: FavoriteClassRepository,
+    private authService: AuthService,
   ) {}
   create(createClassDto: CreateClassDto) {
     return this.classRepository.createClass(createClassDto);
   }
 
-  getAllClasses() {
-    return this.classRepository.getAllClasses();
+  async getAllClasses(token: string) {
+    if (token) {
+      const isVerified = await this.authService.validAccessToken(token);
+      if (isVerified) {
+        const { id } = this.authService.decodeJWTToken(token);
+        return this.getClassesWithUserLiked(id);
+      }
+    } else {
+      return this.classRepository.getAllClasses();
+    }
   }
 
   async getClassesWithUserLiked(userId: number) {
@@ -29,17 +39,14 @@ export class ClassService {
 
     const classIdsWithLiked =
       await this.favoriteClassRepository.getLikedClassIds(userId);
-    if (classIdsWithLiked.length === 0) {
-      return classes;
-    } else {
-      const classesWithLiked = classes.map((item) => {
-        return {
-          ...item,
-          isLiked: classIdsWithLiked.includes(item.id),
-        };
-      });
-      return classesWithLiked;
-    }
+
+    const classesWithLiked = classes.map((item) => {
+      return {
+        ...item,
+        isLiked: classIdsWithLiked.includes(item.id),
+      };
+    });
+    return classesWithLiked;
   }
 
   getClassById(id: number) {

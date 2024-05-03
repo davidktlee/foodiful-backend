@@ -11,12 +11,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { GetUserToken } from 'src/auth/get-user-token.decorator';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('product')
 @ApiTags('product')
@@ -26,11 +25,6 @@ export class ProductController {
   @Get('/all')
   getProducts(@GetUserToken() token: string) {
     return this.productService.getProducts(token);
-  }
-
-  @Get('/all/:userid')
-  getProductsWithUserLiked(@Param('userid', ParseIntPipe) userId: number) {
-    return this.productService.getProductsWithUserLiked(userId);
   }
 
   // id로 상품 얻기
@@ -52,7 +46,7 @@ export class ProductController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   @Post()
-  addProduct(@Body() productData: CreateProductDto): Promise<Product> {
+  addProduct(@Body() productData): Promise<Product> {
     return this.productService.addProduct(productData);
   }
 

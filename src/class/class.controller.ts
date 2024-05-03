@@ -14,6 +14,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { ClassService } from './class.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
+import { GetUserToken } from 'src/auth/get-user-token.decorator';
 
 @Controller('class')
 export class ClassController {
@@ -27,13 +28,8 @@ export class ClassController {
   }
 
   @Get('/all')
-  getAllClasses() {
-    return this.classService.getAllClasses();
-  }
-
-  @Get('/all/:userid')
-  getClassesWithUserLiked(@Param('userid', ParseIntPipe) userId: number) {
-    return this.classService.getClassesWithUserLiked(userId);
+  getAllClasses(@GetUserToken() token: string) {
+    return this.classService.getAllClasses(token);
   }
 
   @Get(':id')
