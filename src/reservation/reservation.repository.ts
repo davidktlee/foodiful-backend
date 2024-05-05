@@ -17,7 +17,7 @@ export class ReservationRepository {
 
   getReservationByClassId(id: number) {
     return this.prisma.reservation.findMany({
-      where: { classId: id },
+      where: { lectureId: id },
     });
   }
 

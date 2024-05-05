@@ -20,14 +20,14 @@ model User {
   account         Account?
   board           Board?
   Cart            Cart[]
-  classReviews    ClassReview[]
-  favoriteClass   FavoriteClass?
+  lectureReview   LectureReview[]
+  favoriteLecture FavoriteLecture?
   favoriteProduct FavoriteProduct[]
   message         Message[]
   order           Order[]
   productReviews  ProductReview[]
   reservations    Reservation[]
-  refund Refund[]
+  refund          Refund[]
 }
 
 model Account {
@@ -38,24 +38,24 @@ model Account {
   user         User     @relation(fields: [userId], references: [id])
 }
 
-model Class {
-  name          String          @unique
-  price         Int
-  discount      Int             @default(0)
-  description   String
-  classDuration Int
-  descImg       String[]
-  id            Int             @id @default(autoincrement())
-  reviews       ClassReview[]
-  favoriteClass FavoriteClass[]
-  reservation   Reservation[]
+model Lecture {
+  name            String            @unique
+  price           Int
+  discount        Int               @default(0)
+  description     String
+  lectureDuration Int
+  descImg         String[]
+  id              Int               @id @default(autoincrement())
+  reviews         LectureReview[]
+  favoriteLecture FavoriteLecture[]
+  reservation     Reservation[]
 }
 
-model FavoriteClass {
-  userId  Int   @unique
-  classId Int
-  class   Class @relation(fields: [classId], references: [id])
-  user    User  @relation(fields: [userId], references: [id])
+model FavoriteLecture {
+  userId    Int     @unique
+  lectureId Int
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
 }
 
 model Product {
@@ -99,7 +99,7 @@ model Order {
   postalCode             String
   user                   User           @relation(fields: [userId], references: [id])
   orderProduct           OrderProduct[]
-  refund Refund[]
+  refund                 Refund[]
 }
 
 model OrderProduct {
@@ -115,11 +115,11 @@ model OrderProduct {
 
 model Reservation {
   userId      Int
-  classId     Int
+  lectureId   Int
   id          Int      @id @default(autoincrement())
   deleted     Boolean  @default(false)
   reserveDate String[]
-  class       Class    @relation(fields: [classId], references: [id])
+  lecture     Lecture  @relation(fields: [lectureId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 }
 
@@ -139,17 +139,17 @@ model ProductReview {
   @@index([productId, userId])
 }
 
-model ClassReview {
+model LectureReview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   comment   String
   rating    Float
   userId    Int
-  classId   Int
+  lectureId Int
   id        Int      @id @default(autoincrement())
   deleted   Boolean  @default(false)
   reviewImg String[]
-  class     Class    @relation(fields: [classId], references: [id])
+  lecture   Lecture  @relation(fields: [lectureId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -193,15 +193,15 @@ model Cart {
 }
 
 model Refund {
-  id Int @id @default(autoincrement())
-  refundAt DateTime @default(now())
+  id           Int          @id @default(autoincrement())
+  refundAt     DateTime     @default(now())
   refundReason String
-  userId Int
-  orderId String @unique
-  totalPrice Int 
-  status RefundStatus @default(PROCEEDING)
-  user User   @relation(fields: [userId], references: [id]) 
-  order Order @relation(fields: [orderId], references: [id])
+  userId       Int
+  orderId      String       @unique
+  totalPrice   Int
+  status       RefundStatus @default(PROCEEDING)
+  user         User         @relation(fields: [userId], references: [id])
+  order        Order        @relation(fields: [orderId], references: [id])
 }
 
 enum UserRole {

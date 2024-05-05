@@ -1,10 +1,8 @@
 import { CacheModule, Module } from '@nestjs/common';
-import { ClassService } from './class.service';
-import { ClassController } from './class.controller';
-import { ClassRepository } from './class.repository';
+
 import { PrismaService } from 'src/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
-import { FavoriteClassRepository } from 'src/favorite-class/favorite-class.repository';
+import { FavoriteLectureRepository } from 'src/favorite-lecture/favorite-lecture.repository';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRepository } from 'src/user/user.repository';
 import { AccountRepository } from 'src/auth/account.repository';
@@ -13,6 +11,9 @@ import { PassportModule } from '@nestjs/passport';
 import { MulterOptionsFactory } from 'src/common/multer.options';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
+import { LectureController } from './lecture.controller';
+import { LectureService } from './lecture.service';
+import { LectureRepository } from './lecture.repository';
 
 @Module({
   imports: [
@@ -33,15 +34,15 @@ import { MulterModule } from '@nestjs/platform-express';
     }),
     CacheModule.register({ ttl: 60000 }),
   ],
-  controllers: [ClassController],
+  controllers: [LectureController],
   providers: [
-    ClassService,
-    ClassRepository,
-    FavoriteClassRepository,
+    LectureService,
+    LectureRepository,
+    FavoriteLectureRepository,
     PrismaService,
     AuthService,
     UserRepository,
     AccountRepository,
   ],
 })
-export class ClassModule {}
+export class LectureModule {}

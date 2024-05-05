@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ClassRepository } from 'src/class/class.repository';
+import { LectureRepository } from 'src/lecture/lecture.repository';
 import { PrismaService } from 'src/prisma.service';
 import { UserRepository } from 'src/user/user.repository';
 import { UserService } from 'src/user/user.service';
@@ -15,7 +15,7 @@ import { ReservationService } from './reservation.service';
     ReservationRepository,
     PrismaService,
     UserRepository,
-    ClassRepository,
+    LectureRepository,
     JwtService,
   ],
 })

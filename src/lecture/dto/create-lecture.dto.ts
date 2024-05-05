@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNumber, IsString } from 'class-validator';
 
-export class CreateClassDto {
+export class CreateLectureDto {
   @ApiProperty({ required: true, example: '정규 클래스' })
   @IsString()
   readonly name: string;
@@ -20,7 +20,7 @@ export class CreateClassDto {
 
   @ApiProperty({ required: true, example: 120 })
   @IsNumber()
-  readonly classDuration: number;
+  readonly lectureDuration: number;
 
   @ApiProperty({
     required: true,

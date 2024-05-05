@@ -5,5 +5,5 @@ export class CreateReservationDto {
   readonly reserveDate: string;
 
   @IsNumber()
-  readonly classId: number;
+  readonly lectureId: number;
 }
