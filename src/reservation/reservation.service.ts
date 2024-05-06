@@ -1,10 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '@prisma/client';
-import dayjs from 'dayjs';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Reservation, User } from '@prisma/client';
 import { LectureRepository } from 'src/lecture/lecture.repository';
 import { UserRepository } from 'src/user/user.repository';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationRepository } from './reservation.repository';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 
 @Injectable()
 export class ReservationService {
@@ -28,6 +34,14 @@ export class ReservationService {
 
   async createReservation(reservation: CreateReservationDto, user: User) {
     const { id, name } = await this.userRepository.getUserById(user.id);
+    const reservations = await this.getAllReservations();
+
+    const isAvailableTime = this.isAvailableReservationTime(
+      reservation.reserveDate,
+      reservations.map((reserve) => reserve),
+    );
+    if (!isAvailableTime)
+      throw new ConflictException('이미 존재하는 예약 시간입니다.');
 
     const { lectureDuration } = await this.lectureRepository.getLectureById(
       reservation.lectureId,
@@ -62,5 +76,26 @@ export class ReservationService {
     }
 
     return dates;
+  }
+
+  isAvailableReservationTime(reserveTime: string, reserved: Reservation[]) {
+    const timeToCheck = dayjs(reserveTime);
+    let isAvailable = true;
+    reserved.map((reserve) => {
+      const startTime = dayjs(reserve.reserveDate[0]);
+      const endTime = dayjs(
+        reserve.reserveDate[reserve.reserveDate.length - 1],
+      );
+
+      console.log(timeToCheck.isBetween(startTime, endTime));
+      if (timeToCheck.isBetween(startTime, endTime)) {
+        isAvailable = false;
+        return;
+      } else if (timeToCheck.isSame(startTime)) {
+        isAvailable = false;
+        return;
+      }
+    });
+    return isAvailable;
   }
 }
