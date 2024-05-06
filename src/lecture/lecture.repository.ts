@@ -15,6 +15,13 @@ export class LectureRepository {
       include: { reservation: true },
     });
   }
+
+  async getLectureByName(name: string) {
+    return this.prisma.lecture.findUnique({
+      where: { name },
+    });
+  }
+
   async createLecture(createLectureDto: CreateLectureDto) {
     return this.prisma.lecture.create({
       data: { ...createLectureDto },

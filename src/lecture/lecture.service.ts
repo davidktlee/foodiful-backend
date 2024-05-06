@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -17,9 +18,11 @@ export class LectureService {
     private favoriteLectureRepository: FavoriteLectureRepository,
     private authService: AuthService,
   ) {}
-  addLecture(CreateLectureDto: CreateLectureDto) {
-    // const lecture =
-    return this.lectureRepository.createLecture(CreateLectureDto);
+
+  async addLecture(createLectureDto: CreateLectureDto) {
+    const lecture = await this.getLectureByName(createLectureDto.name);
+    if (lecture) throw new ConflictException('이미 존재하는 클래스입니다.');
+    return this.lectureRepository.createLecture(createLectureDto);
   }
 
   async getAllLectures(token: string) {
@@ -52,6 +55,10 @@ export class LectureService {
 
   getLectureById(id: number) {
     return this.lectureRepository.getLectureById(id);
+  }
+
+  getLectureByName(name: string) {
+    return this.lectureRepository.getLectureByName(name);
   }
 
   update(id: number, updateLectureDto: UpdateLectureDto) {

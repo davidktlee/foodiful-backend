@@ -20,14 +20,14 @@ model User {
   account         Account?
   board           Board?
   Cart            Cart[]
-  lectureReview   LectureReview[]
   favoriteLecture FavoriteLecture?
   favoriteProduct FavoriteProduct[]
+  lectureReview   LectureReview[]
   message         Message[]
   order           Order[]
   productReviews  ProductReview[]
-  reservations    Reservation[]
   refund          Refund[]
+  reservations    Reservation[]
 }
 
 model Account {
@@ -42,12 +42,14 @@ model Lecture {
   name            String            @unique
   price           Int
   discount        Int               @default(0)
+  subTitle        String
   description     String
-  lectureDuration Int
   descImg         String[]
   id              Int               @id @default(autoincrement())
-  reviews         LectureReview[]
+  lectureDuration Int
+  regular         Boolean
   favoriteLecture FavoriteLecture[]
+  reviews         LectureReview[]
   reservation     Reservation[]
 }
 
@@ -69,9 +71,9 @@ model Product {
   id              Int               @id @default(autoincrement())
   subTitle        String
   limitQuantity   Int               @default(0)
+  carts           Cart?
   favoriteProduct FavoriteProduct[]
   orderProduct    OrderProduct[]
-  carts           Cart[]
   reviews         ProductReview[]
 }
 
@@ -94,12 +96,12 @@ model Order {
   requirement            String?
   totalPrice             Int
   deliverPhone           String
-  orderStatus            OrderStatus    @default(PROCEEDING)
   deliverSpecificAddress String
+  orderStatus            OrderStatus    @default(PROCEEDING)
   postalCode             String
   user                   User           @relation(fields: [userId], references: [id])
   orderProduct           OrderProduct[]
-  refund                 Refund[]
+  refund                 Refund?
 }
 
 model OrderProduct {
@@ -115,10 +117,10 @@ model OrderProduct {
 
 model Reservation {
   userId      Int
-  lectureId   Int
   id          Int      @id @default(autoincrement())
   deleted     Boolean  @default(false)
   reserveDate String[]
+  lectureId   Int
   lecture     Lecture  @relation(fields: [lectureId], references: [id])
   user        User     @relation(fields: [userId], references: [id])
 }
@@ -183,9 +185,9 @@ model Message {
 model Cart {
   id              Int     @id @default(autoincrement())
   userId          Int
-  quantity        Int
   additionalCount Int
   productId       Int     @unique
+  quantity        Int
   product         Product @relation(fields: [productId], references: [id])
   user            User    @relation(fields: [userId], references: [id])
 
@@ -194,14 +196,14 @@ model Cart {
 
 model Refund {
   id           Int          @id @default(autoincrement())
-  refundAt     DateTime     @default(now())
-  refundReason String
   userId       Int
   orderId      String       @unique
-  totalPrice   Int
+  refundAt     DateTime     @default(now())
+  refundReason String
   status       RefundStatus @default(PROCEEDING)
-  user         User         @relation(fields: [userId], references: [id])
+  totalPrice   Int
   order        Order        @relation(fields: [orderId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
 }
 
 enum UserRole {
@@ -212,9 +214,9 @@ enum UserRole {
 
 enum OrderStatus {
   PROCEEDING
-  SHIPPING
   COMPLETE
   CANCEL
+  SHIPPING
 }
 
 enum RefundStatus {

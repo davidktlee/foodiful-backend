@@ -16,6 +16,7 @@ import { Product } from './entity/product.entity';
 import { ProductService } from './product.service';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('product')
 @ApiTags('product')
