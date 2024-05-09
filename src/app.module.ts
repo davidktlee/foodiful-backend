@@ -17,6 +17,8 @@ import { CartModule } from './cart/cart.module';
 import { RefundModule } from './refund/refund.module';
 import { LectureModule } from './lecture/lecture.module';
 import { FavoriteLectureModule } from './favorite-lecture/favorite-lecture.module';
+import { LectureInquiryModule } from './lecture-inquiry/lecture-inquiry.module';
+import { RecommentModule } from './recomment/recomment.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { FavoriteLectureModule } from './favorite-lecture/favorite-lecture.modul
     FavoriteLectureModule,
     CartModule,
     RefundModule,
+    LectureInquiryModule,
+    RecommentModule,
   ],
   controllers: [AppController],
   providers: [

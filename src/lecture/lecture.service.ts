@@ -61,6 +61,12 @@ export class LectureService {
     return this.lectureRepository.getLectureByName(name);
   }
 
+  async getLectureInquiry(id: number) {
+    const lecture = await this.lectureRepository.getLectureInquiry(id);
+    if (!lecture) throw new NotFoundException('찾으시는 클래스가 없습니다.');
+    return lecture.inquiry;
+  }
+
   update(id: number, updateLectureDto: UpdateLectureDto) {
     const existClass = this.lectureRepository.getLectureById(id);
     if (!existClass) throw new NotFoundException('찾으시는 클래스가 없습니다');

@@ -32,6 +32,11 @@ export class LectureController {
     return this.lectureService.getAllLectures(token);
   }
 
+  @Get('/inquiry/:id')
+  getAllInquiryByLectureId(@Param('id', ParseIntPipe) id: number) {
+    return this.lectureService.getLectureInquiry(id);
+  }
+
   @Get(':id')
   getLectureById(@Param('id', ParseIntPipe) id: number) {
     return this.lectureService.getLectureById(id);

@@ -22,12 +22,13 @@ model User {
   Cart            Cart[]
   favoriteLecture FavoriteLecture?
   favoriteProduct FavoriteProduct[]
-  lectureReview   LectureReview[]
+  lectureInquiry  LectureInquiry[]
   message         Message[]
   order           Order[]
   productReviews  ProductReview[]
   refund          Refund[]
   reservations    Reservation[]
+  recomment       Recomment[]
 }
 
 model Account {
@@ -49,7 +50,7 @@ model Lecture {
   lectureDuration Int
   regular         Boolean
   favoriteLecture FavoriteLecture[]
-  reviews         LectureReview[]
+  inquiry         LectureInquiry[]
   reservation     Reservation[]
 }
 
@@ -141,18 +142,31 @@ model ProductReview {
   @@index([productId, userId])
 }
 
-model LectureReview {
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model LectureInquiry {
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   comment   String
-  rating    Float
+  isSecret  Boolean
   userId    Int
   lectureId Int
-  id        Int      @id @default(autoincrement())
-  deleted   Boolean  @default(false)
-  reviewImg String[]
-  lecture   Lecture  @relation(fields: [lectureId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  id        Int         @id @default(autoincrement())
+  deleted   Boolean     @default(false)
+  lecture   Lecture     @relation(fields: [lectureId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  recomment Recomment[]
+}
+
+model Recomment {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  parentId  Int
+  comment   String
+  isSecret  Boolean
+  deleted   Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  user      User           @relation(fields: [userId], references: [id])
+  parent    LectureInquiry @relation(fields: [parentId], references: [id])
 }
 
 model Board {

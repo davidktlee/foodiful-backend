@@ -22,6 +22,13 @@ export class LectureRepository {
     });
   }
 
+  getLectureInquiry(id: number) {
+    return this.prisma.lecture.findUnique({
+      where: { id },
+      include: { inquiry: true },
+    });
+  }
+
   async createLecture(createLectureDto: CreateLectureDto) {
     return this.prisma.lecture.create({
       data: { ...createLectureDto },
