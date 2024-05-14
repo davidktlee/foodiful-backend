@@ -81,8 +81,8 @@ model Product {
 model FavoriteProduct {
   userId    Int
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
-  user      User    @relation(fields: [userId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, productId])
 }
@@ -136,7 +136,7 @@ model ProductReview {
   deleted   Boolean  @default(false)
   rating    Int
   reviewImg String?
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([productId, userId])
@@ -151,7 +151,7 @@ model LectureInquiry {
   lectureId Int
   id        Int         @id @default(autoincrement())
   deleted   Boolean     @default(false)
-  lecture   Lecture     @relation(fields: [lectureId], references: [id])
+  lecture   Lecture     @relation(fields: [lectureId], references: [id], onDelete: Cascade)
   user      User        @relation(fields: [userId], references: [id])
   recomment Recomment[]
 }
@@ -166,7 +166,7 @@ model Recomment {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   user      User           @relation(fields: [userId], references: [id])
-  parent    LectureInquiry @relation(fields: [parentId], references: [id])
+  parent    LectureInquiry @relation(fields: [parentId], references: [id], onDelete: Cascade)
 }
 
 model Board {
@@ -202,8 +202,8 @@ model Cart {
   additionalCount Int
   productId       Int     @unique
   quantity        Int
-  product         Product @relation(fields: [productId], references: [id])
-  user            User    @relation(fields: [userId], references: [id])
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
