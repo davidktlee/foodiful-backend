@@ -41,10 +41,10 @@ export class RecommentController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateRecommentDto: UpdateRecommentDto,
   ) {
-    return this.recommentService.update(+id, updateRecommentDto);
+    return this.recommentService.update(id, updateRecommentDto);
   }
 
   @Delete(':id')

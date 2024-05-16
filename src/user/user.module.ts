@@ -9,6 +9,7 @@ import { RefundRepository } from 'src/refund/refund.repository';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
+import { LectureRepository } from 'src/lecture/lecture.repository';
 
 @Module({
   controllers: [UserController],
@@ -22,6 +23,7 @@ import { UserService } from './user.service';
     ProductRepository,
     JwtService,
     RefundRepository,
+    LectureRepository,
   ],
 })
 export class UserModule {}

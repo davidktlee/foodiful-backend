@@ -26,11 +26,17 @@ export class FavoriteLectureRepository {
     });
   }
 
-  async create(createFavoriteLectureDto: CreateFavoriteLectureDto) {
+  async create(userId: number, lectureId: number) {
     return this.prisma.favoriteLecture.create({
       data: {
-        ...createFavoriteLectureDto,
+        userId,
+        lectureId,
       },
+    });
+  }
+  remove(userId: number, lectureId: number) {
+    return this.prisma.favoriteLecture.delete({
+      where: { userId, lectureId },
     });
   }
 }

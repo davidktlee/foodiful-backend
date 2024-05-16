@@ -13,8 +13,8 @@ import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { ConfigService } from '@nestjs/config';
 import { OrderRepository } from 'src/order/order.repository';
 import { ProductReviewService } from 'src/product-review/product-review.service';
-import { ProductReviewRepository } from 'src/product-review/product-review.repository';
 import { RefundRepository } from 'src/refund/refund.repository';
+import { LectureRepository } from 'src/lecture/lecture.repository';
 
 @Injectable()
 export class UserService {
@@ -24,6 +24,7 @@ export class UserService {
     private readonly config: ConfigService,
     private productReviewService: ProductReviewService,
     private refundRepository: RefundRepository,
+    private lectureRepository: LectureRepository,
   ) {}
 
   /**
@@ -114,7 +115,22 @@ export class UserService {
 
   async getReservationByUserId(userId: number) {
     const user = await this.userRepository.getReservationByUserId(userId);
-    if (user) return user.reservations;
+    const reservationWithLecture = await Promise.allSettled(
+      user.reservations.map(async (reserve) => {
+        const lecture = await this.lectureRepository.getLectureById(
+          reserve.lectureId,
+        );
+        console.log(lecture);
+        return {
+          ...reserve,
+          lectureName: lecture.name,
+          lecturePrice: lecture.price,
+          lectureDuration: lecture.lectureDuration,
+          lectureRegular: lecture.regular,
+        };
+      }),
+    ).then((item) => item.map((v) => v.status === 'fulfilled' && v.value));
+    if (user) return reservationWithLecture;
   }
 
   async getRefundsByUserId(userId: number) {

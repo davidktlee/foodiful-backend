@@ -46,10 +46,10 @@ export class LectureInquiryController {
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateLectureInquiryDto: UpdateLectureInquiryDto,
   ) {
-    return this.lectureInquiryService.update(+id, updateLectureInquiryDto);
+    return this.lectureInquiryService.update(id, updateLectureInquiryDto);
   }
 
   @Delete(':id')
