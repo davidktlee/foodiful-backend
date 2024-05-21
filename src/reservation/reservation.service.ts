@@ -86,8 +86,6 @@ export class ReservationService {
       const endTime = dayjs(
         reserve.reserveDate[reserve.reserveDate.length - 1],
       );
-
-      console.log(timeToCheck.isBetween(startTime, endTime));
       if (timeToCheck.isBetween(startTime, endTime)) {
         isAvailable = false;
         return;

@@ -120,9 +120,9 @@ export class UserService {
         const lecture = await this.lectureRepository.getLectureById(
           reserve.lectureId,
         );
-        console.log(lecture);
         return {
           ...reserve,
+          reserveDate: reserve.reserveDate[0],
           lectureName: lecture.name,
           lecturePrice: lecture.price,
           lectureDuration: lecture.lectureDuration,

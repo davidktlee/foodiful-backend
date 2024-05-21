@@ -42,6 +42,7 @@ export class ProductReviewRepository {
   getUserProductReviews(userId: number) {
     return this.prisma.productReview.findMany({
       where: { userId },
+      include: { product: true },
     });
   }
 }

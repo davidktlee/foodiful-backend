@@ -9,7 +9,15 @@ export class FavoriteLectureService {
   }
 
   async getFavoriteLectureByUserId(userId: number) {
-    return this.favoriteLectureRepository.getFavoriteLectureByUserId(userId);
+    const favorite =
+      await this.favoriteLectureRepository.getFavoriteLectureByUserId(userId);
+
+    if (!!favorite.length) {
+      return favorite.map((item) => ({
+        ...item.lecture,
+        isLiked: true,
+      }));
+    }
   }
 
   remove(userId: number, lectureId: number) {
