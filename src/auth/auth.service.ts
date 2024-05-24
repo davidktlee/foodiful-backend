@@ -20,6 +20,7 @@ import { Cache } from 'cache-manager';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AccountRepository } from './account.repository';
+import axios from 'axios';
 
 @Injectable()
 @UseInterceptors(CacheInterceptor)
@@ -81,18 +82,17 @@ export class AuthService {
       },
     };
     // 실제 메시지 보내는 로직
-    // try {
-    //   const res = await axios.post(
-    //     this.configService.get('NCP_URI'),
-    //     body,
-    //     options,
-    //   );
-    //   console.log(res);
-    // } catch (error) {
-    //   console.log(error);
-    //   throw new InternalServerErrorException('서버 에러');
-    // }
-    console.log(verifyCode);
+    try {
+      const res = await axios.post(
+        this.configService.get('NCP_URI'),
+        body,
+        options,
+      );
+      // console.log(res);
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('서버 에러');
+    }
     await this.cacheManager.set(phoneNumber, verifyCode, 180000);
   }
 

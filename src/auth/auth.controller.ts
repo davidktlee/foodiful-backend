@@ -2,30 +2,23 @@ import {
   Body,
   Controller,
   Get,
-  Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 
 import {
   ApiBadRequestResponse,
-  ApiBasicAuth,
   ApiBearerAuth,
-  ApiBody,
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
-  ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UserEntity } from '../user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guards/jwt.guard';
@@ -33,8 +26,6 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUser } from './get-user.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Roles } from './roles.decorator';
-import { RolesGuard } from './guards/roles.guard';
 import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 

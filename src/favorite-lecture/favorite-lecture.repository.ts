@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateFavoriteLectureDto } from './dto/create-favorite-lecture.dto';
 
 @Injectable()
 export class FavoriteLectureRepository {

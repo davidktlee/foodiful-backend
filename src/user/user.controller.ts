@@ -7,21 +7,12 @@ import {
   Param,
   ParseIntPipe,
   Patch,
-  Post,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiForbiddenResponse,
-  ApiOkResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
-import { GetUser } from 'src/auth/get-user.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
@@ -35,6 +26,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
+  @Roles('ADMIN')
   @ApiOkResponse({ type: UserEntity, isArray: true })
   @ApiForbiddenResponse({ type: ForbiddenException, description: 'Forbidden' })
   async getUsers() {
