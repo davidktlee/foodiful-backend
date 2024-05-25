@@ -66,7 +66,7 @@ export class AuthService {
       type: 'SMS',
       contentType: 'COMM',
       from: this.configService.get('HOST_PHONE_NUMBER'),
-      content: `인증번호 [${verifyCode}]를 입력 해주세요.`,
+      content: `[푸디풀] 인증번호 [${verifyCode}]를 입력 해주세요.`,
       messages: [
         {
           to: phoneNumber,
