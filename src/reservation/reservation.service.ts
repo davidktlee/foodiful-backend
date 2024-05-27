@@ -20,19 +20,22 @@ export class ReservationService {
     private userRepository: UserRepository,
   ) {}
 
-  async getAllReservations() {
+  async getAllReservations(): Promise<Reservation[]> {
     const reservations = await this.reservationRepository.getAllReservations();
     return reservations;
   }
 
-  async getReservationByReservationId(id: number) {
+  async getReservationByReservationId(id: number): Promise<Reservation> {
     const reservations =
       await this.reservationRepository.getReservationByReservationId(id);
     if (!reservations) throw new NotFoundException('예약 없음');
     return reservations;
   }
 
-  async createReservation(reservation: CreateReservationDto, user: User) {
+  async createReservation(
+    reservation: CreateReservationDto,
+    user: User,
+  ): Promise<Reservation> {
     const { id, name } = await this.userRepository.getUserById(user.id);
     const reservations = await this.getAllReservations();
 

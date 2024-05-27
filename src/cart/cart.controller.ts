@@ -9,7 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Cart, Prisma, User } from '@prisma/client';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { CartService } from './cart.service';
@@ -39,16 +39,17 @@ export class CartController {
   updateCart(
     @Param('cartId', ParseIntPipe) cartId: number,
     @Body() updateCartDto: UpdateCartDto,
-  ) {
+  ): Promise<Cart> {
     return this.cartService.updateCart(cartId, updateCartDto);
   }
 
   @Delete('/all')
-  deleteAllItems(@GetUser() user: User) {
+  deleteAllItems(@GetUser() user: User): Promise<Prisma.BatchPayload> {
     return this.cartService.deleteAllItems(user.id);
   }
+
   @Delete(':cartId')
-  deleteCartItem(@Param('cartId', ParseIntPipe) cartId: number) {
+  deleteCartItem(@Param('cartId', ParseIntPipe) cartId: number): Promise<Cart> {
     return this.cartService.deleteCartItem(cartId);
   }
 }

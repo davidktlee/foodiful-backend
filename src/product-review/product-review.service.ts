@@ -8,6 +8,7 @@ import { UserRepository } from 'src/user/user.repository';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { UpdateProductReviewDto } from './dto/update-product-review.dto';
 import { ProductReviewRepository } from './product-review.repository';
+import { ProductReview } from '@prisma/client';
 
 @Injectable()
 export class ProductReviewService {
@@ -16,7 +17,9 @@ export class ProductReviewService {
     private userRepository: UserRepository,
     private productRepository: ProductRepository,
   ) {}
-  createProductReview(createProductReviewDto: CreateProductReviewDto) {
+  createProductReview(
+    createProductReviewDto: CreateProductReviewDto,
+  ): Promise<ProductReview> {
     const user = this.userRepository.getUserById(createProductReviewDto.userId);
     const product = this.productRepository.getProductById(
       createProductReviewDto.productId,
@@ -28,14 +31,14 @@ export class ProductReviewService {
     );
   }
 
-  getAllProductReviewsByProductId(productId: number) {
+  getAllProductReviewsByProductId(productId: number): Promise<ProductReview[]> {
     return this.productReviewRepository.getAllProductReviews(productId);
   }
 
   updateProductReview(
     reviewId: number,
     updateProductReviewDto: UpdateProductReviewDto,
-  ) {
+  ): Promise<ProductReview> {
     const productReview =
       this.productReviewRepository.getProductReviewById(reviewId);
     if (!productReview)
@@ -46,14 +49,14 @@ export class ProductReviewService {
     );
   }
 
-  async deleteProductReview(id: number) {
+  async deleteProductReview(id: number): Promise<ProductReview> {
     const productReview =
       await this.productReviewRepository.getProductReviewById(id);
     if (!productReview) throw new NotFoundException('삭제하실 리뷰가 없습니다');
     return this.productReviewRepository.deleteProductReview(id);
   }
 
-  getUserProductReviews(userId: number) {
+  getUserProductReviews(userId: number): Promise<ProductReview[]> {
     return this.productReviewRepository.getUserProductReviews(userId);
   }
 }

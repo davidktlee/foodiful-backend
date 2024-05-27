@@ -11,7 +11,7 @@ import {
 import { FavoriteLectureService } from './favorite-lecture.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
-import { User } from '@prisma/client';
+import { FavoriteLecture, Lecture, User } from '@prisma/client';
 import { CreateFavoriteLectureDto } from './dto/create-favorite-lecture.dto';
 
 @Controller('favorite-lecture')
@@ -22,12 +22,17 @@ export class FavoriteLectureController {
   ) {}
 
   @Post()
-  create(@GetUser() user: User, @Body() data: CreateFavoriteLectureDto) {
+  create(
+    @GetUser() user: User,
+    @Body() data: CreateFavoriteLectureDto,
+  ): Promise<FavoriteLecture> {
     return this.favoriteLectureService.create(user.id, data.lectureId);
   }
 
   @Get()
-  getFavoriteLectureByUserId(@GetUser() user: User) {
+  getFavoriteLectureByUserId(
+    @GetUser() user: User,
+  ): Promise<(Lecture & { isLiked: boolean })[]> {
     return this.favoriteLectureService.getFavoriteLectureByUserId(user.id);
   }
 
@@ -35,7 +40,7 @@ export class FavoriteLectureController {
   remove(
     @GetUser() user: User,
     @Param('lectureId', ParseIntPipe) lectureId: number,
-  ) {
+  ): Promise<FavoriteLecture> {
     return this.favoriteLectureService.remove(user.id, lectureId);
   }
 }

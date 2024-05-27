@@ -31,12 +31,14 @@ export class ReservationController {
   createReservation(
     @GetUser() user: User,
     @Body() reservationData: CreateReservationDto,
-  ) {
+  ): Promise<Reservation> {
     return this.reservationService.createReservation(reservationData, user);
   }
 
   @Get(':id')
-  getReservationByReservationId(@Param('id', ParseIntPipe) id: number) {
+  getReservationByReservationId(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Reservation> {
     return this.reservationService.getReservationByReservationId(id);
   }
 }

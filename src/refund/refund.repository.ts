@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateRefundDto } from './dto/create-refund.dto';
+import { Refund } from '@prisma/client';
 
 @Injectable()
 export class RefundRepository {
   constructor(private prisma: PrismaService) {}
-  createRefund(createRefundDto: CreateRefundDto) {
+  createRefund(createRefundDto: CreateRefundDto): Promise<Refund> {
     return this.prisma.refund.create({
       data: { ...createRefundDto },
     });
   }
 
-  getAllRefunds() {
+  getAllRefunds(): Promise<Refund[]> {
     return this.prisma.refund.findMany({});
   }
 
-  getRefundsByUserId(userId: number) {
+  getRefundsByUserId(userId: number): Promise<Refund> {
     return this.prisma.$queryRaw`
       SELECT 
         r."totalPrice", r."orderId", r."refundAt", r."refundReason", r.status,

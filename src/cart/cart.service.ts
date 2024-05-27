@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CartRepository } from './cart.repository';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
+import { Cart, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CartService {
@@ -20,24 +21,23 @@ export class CartService {
     return cart;
   }
 
-  getCartByProductId(productId: number) {
+  getCartByProductId(productId: number): Promise<Cart> {
     return this.cartRepository.getCartByProductId(productId);
   }
 
-  updateCart(cartId: number, updateCartDto: UpdateCartDto) {
+  updateCart(cartId: number, updateCartDto: UpdateCartDto): Promise<Cart> {
     return this.cartRepository.updateCart(cartId, updateCartDto);
   }
 
-  deleteCartItem(cartId: number) {
+  deleteCartItem(cartId: number): Promise<Cart> {
     return this.cartRepository.deleteCart(cartId);
   }
 
-  deleteCartItemByProductId(productId: number) {
-    console.log(productId);
+  deleteCartItemByProductId(productId: number): Promise<Cart> {
     return this.cartRepository.deleteCartItemByProductId(productId);
   }
 
-  deleteAllItems(userId: number) {
+  deleteAllItems(userId: number): Promise<Prisma.BatchPayload> {
     return this.cartRepository.deleteAllProductOnCart(userId);
   }
 }

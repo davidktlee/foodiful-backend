@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrderRepository {
   constructor(private prisma: PrismaService) {}
 
-  create(orderForm: CreateOrderDto['orderForm'], userId: number) {
+  create(
+    orderForm: CreateOrderDto['orderForm'],
+    userId: number,
+  ): Promise<Order> {
     return this.prisma.order.create({
       data: {
         ...orderForm,
@@ -15,7 +19,7 @@ export class OrderRepository {
     });
   }
 
-  getOrderByUserId(userId: number) {
+  getOrderByUserId(userId: number): Promise<Order[]> {
     return this.prisma.order.findMany({
       where: { userId },
       include: {
@@ -26,13 +30,13 @@ export class OrderRepository {
     });
   }
 
-  getOrderByOrderId(orderId: string) {
+  getOrderByOrderId(orderId: string): Promise<Order> {
     return this.prisma.order.findUnique({
       where: { id: orderId },
     });
   }
 
-  cancelOrder(id: string) {
+  cancelOrder(id: string): Promise<Order> {
     return this.prisma.order.update({
       where: { id },
       data: { orderStatus: 'CANCEL' },
