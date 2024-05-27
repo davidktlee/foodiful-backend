@@ -1,15 +1,24 @@
-FROM node:latest
+FROM node:18-alpine
 
-COPY . .
 
+# Only copy the package.json file to work directory
+COPY package*.json ./
 RUN npm uninstall bcrypt
 RUN npm install bcrypt
 RUN npm install
+RUN npm install prisma -g
 
-RUN ls -al
+# wait-for-it.sh
+COPY wait-for-it.sh ./
+RUN chmod +x wait-for-it.sh
+COPY . .
+
+RUN npx prisma generate
 
 RUN npm run build
 
-CMD npm run start:prod
+# CMD npm run start:prod
+CMD ["npm", "run", "start:prod"]
 
 
+EXPOSE 3000
