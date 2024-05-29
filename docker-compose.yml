@@ -3,22 +3,38 @@ version: '3.8'
 services:
   db:
     image: postgres
+    restart: always
     environment:
-      - POSTGRES_DB=test
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=db
+      - POSTGRES_USER=kt
+      - POSTGRES_PASSWORD=12341234
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8
     ports:
       - 5432:5432
   app:
-    build: .
+    image: rudxor567/foodiful-backend-app:ver1.0.0
+    build:
+      context: .
+    platform: linux/amd64
     env_file:
       - .env
     depends_on:
       - db
     ports:
       - '3000:5002'
-    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+    command: bash -c "./wait-for-it.sh db:5432 -t 10 -- npx prisma generate && npx prisma migrate deploy && npm run start:prod"
     # command: npx prisma migrate deploy && npm run start:prod
     volumes:
       - ./:/app/
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   container_name: nest-pgadmin4
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+  #     - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+  #   ports:
+  #     - '5050:80'
+  #   depends_on:
+  #     - db
