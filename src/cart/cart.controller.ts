@@ -21,10 +21,6 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  /**
-   * @TODO: 상품 추가 시 cart 새로 생성 및 상품id와 개수 추가
-
-   */
   @Post()
   create(@GetUser() user: User, @Body() createCartDto: CreateCartDto) {
     return this.cartService.create(createCartDto, user.id);

@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLectureInquiryDto } from './dto/create-lecture-inquiry.dto';
-import { UpdateLectureInquiryDto } from './dto/update-lecture-inquiry.dto';
 import { LectureInquiryRepository } from './lecture-inquiry.repository';
 import { LectureInquiry, Recomment } from '@prisma/client';
 
@@ -29,10 +28,6 @@ export class LectureInquiryService {
 
   findOne(id: number): Promise<LectureInquiry> {
     return this.lectureInquiryRepository.findOne(id);
-  }
-
-  update(id: number, updateLectureInquiryDto: UpdateLectureInquiryDto) {
-    return `This action updates a #${id} lectureInquiry`;
   }
 
   remove(id: number): Promise<LectureInquiry> {
