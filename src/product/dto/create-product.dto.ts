@@ -18,7 +18,7 @@ export class CreateProductDto {
 
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10))
-  readonly quantity: number;
+  readonly limitQuantity: number;
 
   @IsString()
   readonly description: string;
