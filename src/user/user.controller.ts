@@ -19,6 +19,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { UpdateUserDto } from '../auth/dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserService } from './user.service';
+import { GetUser } from 'src/auth/get-user.decorator';
 
 @Controller('user')
 @ApiTags('user')
@@ -37,23 +38,23 @@ export class UserController {
     });
   }
 
-  @Get('/refund/:userId')
+  @Get('/refund')
   @UseGuards(JwtGuard)
-  getRefundsByUserId(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userService.getRefundsByUserId(userId);
+  getRefundsByUserId(@GetUser() user: User) {
+    return this.userService.getRefundsByUserId(user?.id);
   }
 
   // userId를 파라미터로 받은 이유: 리액트 쿼리에서 전체 리뷰와 각 유저에 대한 리뷰를 구분하기 위해서
-  @Get('/product-review/:userId')
+  @Get('/product-review')
   @UseGuards(JwtGuard)
-  getUserProductReviews(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userService.getUserProductReviews(userId);
+  getUserProductReviews(@GetUser() user: User) {
+    return this.userService.getUserProductReviews(user?.id);
   }
 
-  @Get('/reservation/:userId')
+  @Get('/reservation')
   @UseGuards(JwtGuard)
-  getReservationByUserId(@Param('userId', ParseIntPipe) userId: number) {
-    return this.userService.getReservationByUserId(userId);
+  getReservationByUserId(@GetUser() user: User) {
+    return this.userService.getReservationByUserId(user?.id);
   }
 
   @Get(':id')
