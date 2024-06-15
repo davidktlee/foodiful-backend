@@ -47,7 +47,7 @@ export class ProductController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   @Post()
-  addProduct(@Body() productData): Promise<Product> {
+  addProduct(@Body() productData: CreateProductDto): Promise<Product> {
     return this.productService.addProduct(productData);
   }
 
