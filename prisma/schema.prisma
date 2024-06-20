@@ -14,7 +14,7 @@ model User {
   createdAt       DateTime          @default(now())
   email           String            @unique
   id              Int               @id @default(autoincrement())
-  updatedAt       DateTime?
+  updatedAt       DateTime?         @updatedAt
   deleted         Boolean           @default(false)
   role            UserRole          @default(PUBLIC)
   account         Account?
