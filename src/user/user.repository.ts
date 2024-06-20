@@ -94,7 +94,10 @@ export class UserRepository {
     });
   }
 
-  async updateUser(id: number, updateUserData: UpdateUserDto): Promise<User> {
+  async updateUser(
+    id: number,
+    updateUserData: Omit<UpdateUserDto, 'changePassword'>,
+  ): Promise<User> {
     return this.prisma.user.update({
       where: { id },
       data: {

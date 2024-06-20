@@ -76,14 +76,4 @@ export class UserController {
   ): Promise<{ user: User; message: string }> {
     return this.userService.deleteUser(id);
   }
-
-  @Patch(':id')
-  @ApiOkResponse({ type: UserEntity })
-  @UseInterceptors(FileInterceptor('profile'))
-  patchUser(
-    @Param('id') id: number,
-    @Body() updateUserData: UpdateUserDto,
-  ): Promise<{ updatedUser: User; message: string }> {
-    return this.userService.updateUser(id, updateUserData);
-  }
 }

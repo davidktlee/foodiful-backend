@@ -139,14 +139,14 @@ export class AuthService {
     if (!checkedPassword) {
       throw new UnauthorizedException('비밀번호 불일치');
     }
-    const accessToken = await this.getAccessToken(
+    const accessToken = this.getAccessToken(
       userData.email,
       user.name,
       user.role,
       user.phone,
       user.id,
     );
-    const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
+    const cookieWithRefreshToken = this.getCookieWithRefreshToken(
       userData.email,
     );
     await this.accountRepository.updateRefreshToken(
@@ -160,10 +160,16 @@ export class AuthService {
     return { accessToken, cookieWithRefreshToken, user };
   }
 
-  async updateUser(userId, updateUserData: UpdateUserDto) {
+  async updateUser(userId: number, updateUserData: UpdateUserDto) {
     const user = await this.userRepository.getUserById(userId);
     // 패스워드가 있다면 변경 할 패스워드가 있다는 뜻이니 password 비교
     // 없다면 그냥 패스워드 그대로 쓰게끔
+    let willUpdateData: Omit<UpdateUserDto, 'changePassword'> = {
+      email: updateUserData.email,
+      name: updateUserData.name,
+      phone: updateUserData.phone,
+      password: updateUserData.password,
+    };
     if (updateUserData.password) {
       const checkedPassword = await this.compare(
         updateUserData.password,
@@ -172,23 +178,34 @@ export class AuthService {
       if (!checkedPassword) {
         throw new UnauthorizedException('비밀번호 불일치');
       }
+      const hashedPassword = await this.transform(
+        updateUserData.changePassword,
+      );
+
+      willUpdateData = {
+        ...willUpdateData,
+        password: hashedPassword,
+      };
     }
-    const accessToken = await this.getAccessToken(
+
+    const accessToken = this.getAccessToken(
       user.email,
       updateUserData.name,
       user.role,
       updateUserData.phone,
       user.id,
     );
-    const cookieWithRefreshToken = await this.getCookieWithRefreshToken(
-      user.email,
-    );
-    await this.accountRepository.updateRefreshToken(
+    const cookieWithRefreshToken = this.getCookieWithRefreshToken(user.email);
+    this.accountRepository.updateRefreshToken(
       user.id,
       cookieWithRefreshToken.refreshToken,
     );
-    await this.userRepository.updateUser(userId, updateUserData);
-    const updatedUserData = { ...updateUserData, id: user.id, role: user.role };
+    this.userRepository.updateUser(userId, willUpdateData);
+    const updatedUserData = {
+      ...willUpdateData,
+      id: user.id,
+      role: user.role,
+    };
     return { accessToken, cookieWithRefreshToken, updatedUserData };
 
     // 유저 불러온 후 패스워드 비교
@@ -281,11 +298,11 @@ export class AuthService {
 
   // async removeRefreshToken(id: number) {}
 
-  async compare(willCompare, original) {
-    return await bcrypt.compare(willCompare, original);
+  async compare(willCompare: string, original: string) {
+    return bcrypt.compare(willCompare, original);
   }
 
-  async transform(willHash): Promise<User['password']> {
+  async transform(willHash: string): Promise<User['password']> {
     willHash = await bcrypt.hash(willHash, 10);
     return willHash;
   }

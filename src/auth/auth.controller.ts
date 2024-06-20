@@ -81,8 +81,8 @@ export class AuthController {
   })
   @UseGuards(JwtGuard)
   async updateUser(
-    @GetUser() user: User,
     @Body() updateUserData: UpdateUserDto,
+    @GetUser() user: User,
     @Res({ passthrough: true }) res: Response,
   ) {
     const {
