@@ -20,7 +20,7 @@ export class FavoriteLectureService {
         ...item.lecture,
         isLiked: true,
       }));
-    }
+    } else return [];
   }
 
   remove(userId: number, lectureId: number): Promise<FavoriteLecture> {
