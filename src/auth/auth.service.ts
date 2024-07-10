@@ -83,12 +83,7 @@ export class AuthService {
     };
     // 실제 메시지 보내는 로직
     try {
-      const res = await axios.post(
-        this.configService.get('NCP_URI'),
-        body,
-        options,
-      );
-      // console.log(res);
+      await axios.post(this.configService.get('NCP_URI'), body, options);
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException('서버 에러');
@@ -241,7 +236,7 @@ export class AuthService {
       refreshToken,
       path: '/',
       httpOnly: true,
-      // TODO: 나중에 배포하면 secure 옵션 추가해줘야 함.
+      secure: true,
       maxAge: 604800 * 1000,
     };
   }
