@@ -22,6 +22,7 @@ export class ReservationService {
 
   async getAllReservations(): Promise<Reservation[]> {
     const reservations = await this.reservationRepository.getAllReservations();
+    if (!reservations.length) return [];
     return reservations;
   }
 
